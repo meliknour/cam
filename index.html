@@ -1,110 +1,49 @@
-﻿<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!DOCTYPE html>
+<html lang="ar">
 <head>
-  <meta charset="UTF-8" />
-  <title>نظام البحث عن المتربصين</title>
-  <style>
-    body{font-family:"Tahoma",sans-serif;background:#f9f9f9;text-align:center;padding:40px}
-    h2{color:#333}
-    .hint{color:#666;margin-top:-8px;margin-bottom:12px;font-size:14px}
-    input{padding:10px;font-size:16px;width:280px;border-radius:8px;border:1px solid #aaa;margin:10px}
-    button{padding:10px 20px;font-size:16px;border-radius:8px;border:none;background:#4CAF50;color:#fff;cursor:pointer}
-    button:hover{background:#45a049}
-    #result{margin-top:22px;padding:18px;border-radius:10px;background:#fff;box-shadow:0 0 8px rgba(0,0,0,.1);display:inline-block;min-width:320px;text-align:right}
-    .not-found{color:#c62828;font-weight:bold}
-    .ok{color:#2e7d32;font-weight:bold}
-    .muted{color:#777}
-  </style>
+  <meta charset="UTF-8">
+  <title>البحث التلقائي</title>
 </head>
 <body>
-  <h2>🔎 البحث عن المتربص</h2>
-  <div class="hint">اكتب <b>رقمك</b> (مثال: 1) أو <b>الكود الكامل</b> (مثال: 2025-07-1)</div>
-  <input type="text" id="searchId" placeholder="مثال: 1 أو 2025-07-1" />
-  <button onclick="search()">بحث</button>
-
-  <div id="result"></div>
+  <h3>🔍 البحث عن اللجنة</h3>
+  <h4 id="result">جاري البحث...</h4>
 
   <script>
+    // رابط Google Sheets (ثابت هنا)
     const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQqR_h8x3sFfLJCcOUpV4bvWJYTceaXW1DWedcvBGRocmFU81AcMlYJ4lb6CTY4T4pHpM7gf3ZbdWP/pub?gid=0&single=true&output=csv";
 
-    let rows = []; // مصفوفة كائنات {number,name,activity,activityCode,status,committee,searchKey}
+    // نأخذ الكود من الرابط (بعد ?)
+    const query = window.location.search.substring(1); 
+    const resultDiv = document.getElementById("result");
 
-    // دالة بسيطة لتنظيف الخانات من علامات الاقتباس والمسافات
-    const clean = (v) => (v || "").replace(/^"|"$/g, "").replace(/\r/g, "").trim();
-
-    // تطبيع كتابة اللجنة: 2025-7 => 2025-07
-    function normalizeCommittee(c) {
-      c = clean(c);
-      const m = c.match(/^(\d{4})-(\d{1,2})$/);
-      if (m) return `${m[1]}-${m[2].padStart(2, "0")}`;
-      return c;
-    }
-
-    // تحميل CSV وتحويله إلى كائنات
-    fetch(sheetUrl)
-      .then((r) => r.text())
-      .then((csvText) => {
-        const raw = csvText.split("\n").map((line) => line.split(","));
-        // نتوقع العناوين في الصف الأول: الرقم, الاسم واللقب, النشاط, رمز النشاط, الملاحظة, اللجنة
-        const data = raw.slice(1); // تجاهل العناوين
-        rows = data.map((r) => {
-          const number = clean(r[0]);        // العمود A
-          const name = clean(r[1]);          // العمود B
-          const activity = clean(r[2]);      // العمود C
-          const activityCode = clean(r[3]);  // العمود D
-          const status = clean(r[4]);        // العمود E
-          const committee = normalizeCommittee(r[5]); // العمود F
-          const searchKey = committee && number ? `${committee}-${number}` : "";
-          return { number, name, activity, activityCode, status, committee, searchKey };
-        }).filter(r => r.number || r.name); // تخلص من الأسطر الفارغة
-      })
-      .catch(() => {
-        document.getElementById("result").innerHTML =
-          "<p class='not-found'>🚨 تعذر تحميل البيانات من Google Sheets</p>";
-      });
-
-    function search() {
-      const input = clean(document.getElementById("searchId").value);
-      const resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = "";
-
-      if (!input) {
-        resultDiv.innerHTML = "<p class='not-found'>⚠️ الرجاء إدخال رقمك أو الكود الكامل</p>";
+    async function searchData() {
+      if (!query) {
+        resultDiv.textContent = "❌ لم يتم إدخال كود في الرابط";
         return;
       }
 
-      let match = null;
+      try {
+        const response = await fetch(sheetUrl);
+        const data = await response.text();
+        const rows = data.split("\n").map(r => r.split(","));
 
-      if (input.includes("-")) {
-        // بحث بالكود الكامل مثل 2025-07-1
-        // نطبّع الجزء الأوسط (الشهر) إن لزم: نقارن أيضًا بصيغة مُطبّعة
-        const parts = input.split("-");
-        if (parts.length >= 3) {
-          const normalizedMid = parts[1].padStart(2, "0");
-          const normalizedInput = `${parts[0]}-${normalizedMid}-${parts.slice(2).join("-")}`;
-          match = rows.find(r => r.searchKey === input || r.searchKey === normalizedInput);
-        } else {
-          match = rows.find(r => r.searchKey === input);
+        let found = false;
+        rows.forEach(row => {
+          if (row.includes(query)) {
+            resultDiv.textContent = "✅ تم العثور: " + row.join(" | ");
+            found = true;
+          }
+        });
+
+        if (!found) {
+          resultDiv.textContent = "❌ لم يتم العثور على " + query;
         }
-      } else {
-        // بحث برقم فقط (العمود الأول)
-        match = rows.find(r => r.number === input);
-      }
-
-      if (match) {
-        resultDiv.innerHTML = `
-          <p class="ok">✅ تم العثور على السجل</p>
-          <p><strong>الكود:</strong> ${match.searchKey || `<span class="muted">غير متاح</span>`}</p>
-          <p><strong>الاسم واللقب:</strong> ${match.name}</p>
-          <p><strong>النشاط:</strong> ${match.activity}</p>
-          <p><strong>رمز النشاط:</strong> ${match.activityCode}</p>
-          <p><strong>الحالة:</strong> ${match.status}</p>
-          <p><strong>اللجنة:</strong> ${match.committee || `<span class="muted">غير محددة</span>`}</p>
-        `;
-      } else {
-        resultDiv.innerHTML = "<p class='not-found'>❌ لم يتم العثور على هذا الإدخال</p>";
+      } catch (error) {
+        resultDiv.textContent = "🚨 خطأ في جلب البيانات";
       }
     }
+
+    searchData();
   </script>
 </body>
 </html>
