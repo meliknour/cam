@@ -2,48 +2,46 @@
 <html lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>البحث التلقائي</title>
+  <title>البحث في Google Sheets</title>
 </head>
 <body>
-  <h3>🔍 البحث عن اللجنة</h3>
-  <h4 id="result">جاري البحث...</h4>
+  <div id="result">جاري التحميل...</div>
 
   <script>
-    // رابط Google Sheets (ثابت هنا)
-    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQqR_h8x3sFfLJCcOUpV4bvWJYTceaXW1DWedcvBGRocmFU81AcMlYJ4lb6CTY4T4pHpM7gf3ZbdWP/pub?gid=0&single=true&output=csv";
+    // رابط Google Sheets بصيغة CSV (بدل الرابط هذا برابطك)
+    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-XXXXXX/pub?gid=0&single=true&output=csv";
 
-    // نأخذ الكود من الرابط (بعد ?)
-    const query = window.location.search.substring(1); 
+    // ناخذ الكود من الرابط بعد علامة ?
+    const query = window.location.search.substring(1);
+
+    // مكان عرض النتيجة
     const resultDiv = document.getElementById("result");
 
-    async function searchData() {
-      if (!query) {
-        resultDiv.textContent = "❌ لم يتم إدخال كود في الرابط";
-        return;
-      }
+    if (query) {
+      fetch(sheetUrl)
+        .then(res => res.text())
+        .then(csv => {
+          const rows = csv.split("\n").map(r => r.split(","));
+          let found = false;
 
-      try {
-        const response = await fetch(sheetUrl);
-        const data = await response.text();
-        const rows = data.split("\n").map(r => r.split(","));
+          rows.forEach(row => {
+            // نقارن فقط مع العمود الأول (row[0])
+            if (row[0].trim() === query.trim()) {
+              resultDiv.textContent = "✅ تم العثور: " + row.join(" | ");
+              found = true;
+            }
+          });
 
-        let found = false;
-        rows.forEach(row => {
-          if (row.includes(query)) {
-            resultDiv.textContent = "✅ تم العثور: " + row.join(" | ");
-            found = true;
+          if (!found) {
+            resultDiv.textContent = "❌ لم يتم العثور على " + query;
           }
+        })
+        .catch(err => {
+          resultDiv.textContent = "🚨 تعذر تحميل البيانات من Google Sheets";
         });
-
-        if (!found) {
-          resultDiv.textContent = "❌ لم يتم العثور على " + query;
-        }
-      } catch (error) {
-        resultDiv.textContent = "🚨 خطأ في جلب البيانات";
-      }
+    } else {
+      resultDiv.textContent = "ℹ️ لم يتم إدخال أي كود في الرابط";
     }
-
-    searchData();
   </script>
 </body>
 </html>
