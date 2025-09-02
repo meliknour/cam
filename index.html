@@ -8,11 +8,11 @@
   <div id="result">جاري التحميل...</div>
 
   <script>
-    // رابط Google Sheets بصيغة CSV (بدل الرابط هذا برابطك)
+    // رابط Google Sheets بصيغة CSV (غيره برابطك)
     const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-XXXXXX/pub?gid=0&single=true&output=csv";
 
     // ناخذ الكود من الرابط بعد علامة ?
-    const query = window.location.search.substring(1);
+    const query = decodeURIComponent(window.location.search.substring(1)).trim();
 
     // مكان عرض النتيجة
     const resultDiv = document.getElementById("result");
@@ -25,8 +25,10 @@
           let found = false;
 
           rows.forEach(row => {
-            // نقارن فقط مع العمود الأول (row[0])
-            if (row[0].trim() === query.trim()) {
+            // ننظف القيمة من أي مسافات أو رموز غير مرئية
+            const cell = row[0] ? row[0].trim().replace(/\u200B/g, "") : "";
+
+            if (cell === query) {
               resultDiv.textContent = "✅ تم العثور: " + row.join(" | ");
               found = true;
             }
