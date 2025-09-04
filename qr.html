@@ -1,0 +1,119 @@
+﻿<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>بطاقات المتربصين مع QR</title>
+  <style>
+    body {
+      font-family: "Tahoma", sans-serif;
+      background: #fff;
+      padding: 20px;
+    }
+    .page {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr); /* عمودين */
+      gap: 30px;
+      page-break-after: always;
+    }
+    .card {
+      border: 2px dashed #555;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      height: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .name {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .activity {
+      font-size: 16px;
+      color: #444;
+      margin-bottom: 15px;
+    }
+    .qr {
+      margin: auto;
+    }
+    @media print {
+      body {
+        margin: 0;
+      }
+      .page {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h2 style="text-align:center;">🪪 بطاقات المتربصين</h2>
+  <div id="cardsContainer"></div>
+
+  <!-- مكتبة QR -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <script>
+    const sheetUrl =
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQqR_h8x3sFfLJCcOUpV4bvWJYTceaXW1DWedcvBGRocmFU81AcMlYJ4lb6CTY4T4pHpM7gf3ZbdWP/pub?gid=0&single=true&output=csv";
+    const baseUrl = "https://meliknour.github.io/cam/";
+
+    const clean = (v) => (v || "").replace(/^"|"$/g, "").replace(/\r/g, "").trim();
+    function normalizeCommittee(c) {
+      c = clean(c);
+      const m = c.match(/^(\d{4})-(\d{1,2})$/);
+      if (m) return `${m[1]}-${m[2].padStart(2, "0")}`;
+      return c || "0000-00";
+    }
+
+    fetch(sheetUrl)
+      .then((r) => r.text())
+      .then((csvText) => {
+        const raw = csvText.split("\n").map((line) => line.split(","));
+        const data = raw.slice(1);
+
+        const container = document.getElementById("cardsContainer");
+        container.innerHTML = "";
+
+        let pageDiv = null;
+        data.forEach((r, i) => {
+          if (!r[0] || !r[1]) return;
+
+          const number = clean(r[0]);
+          const name = clean(r[1]);
+          const activity = clean(r[2]);
+          const committee = normalizeCommittee(r[5]);
+          const searchKey = `${committee}-${number}`;
+          const link = `${baseUrl}?${searchKey}`;
+
+          if (i % 6 === 0) {
+            pageDiv = document.createElement("div");
+            pageDiv.className = "page";
+            container.appendChild(pageDiv);
+          }
+
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <div class="name">${name}</div>
+            <div class="activity">${activity}</div>
+            <div class="qr" id="qr-${i}"></div>
+          `;
+          pageDiv.appendChild(card);
+
+          new QRCode(document.getElementById(`qr-${i}`), {
+            text: link,
+            width: 100,
+            height: 100,
+          });
+        });
+      })
+      .catch(() => {
+        alert("🚨 تعذر تحميل البيانات من Google Sheets");
+      });
+  </script>
+</body>
+</html>
