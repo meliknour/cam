@@ -28,34 +28,31 @@
     button:hover {background:#5a6fd8;}
     .switch-text {text-align:center; margin-top:28px; font-size:1rem; color:#777;}
     .switch-text a {color:#667eea; text-decoration:none; font-weight:600;}
-    @media (max-height:600px) {.form-container{padding:20px 16px; min-height:360px;} .form h2{font-size:1.3rem;margin-bottom:24px;} input,button{padding:14px;font-size:1rem;}}
   </style>
 </head>
 <body>
 
   <div class="auth-container">
-    <!-- Tabs -->
     <div class="tabs">
       <div class="tab active" onclick="switchForm('login')">تسجيل الدخول</div>
       <div class="tab" onclick="switchForm('register')">إنشاء حساب</div>
     </div>
 
-    <!-- Forms -->
     <div class="form-container">
       <!-- Login Form -->
       <div class="form login-form active">
         <h2>مرحباً بك مجدداً</h2>
         <div class="input-group">
           <label for="login-email">البريد الإلكتروني</label>
-          <input type="email" id="login-email" placeholder="example@email.com" required>
+          <input type="email" id="login-email" required>
         </div>
         <div class="input-group">
           <label for="login-password">كلمة المرور</label>
-          <input type="password" id="login-password" placeholder="••••••••" required>
+          <input type="password" id="login-password" required>
         </div>
         <button type="button" onclick="handleLogin()">تسجيل الدخول</button>
-        <div class="switch-text">
-          ليس لديك حساب؟ <a href="#" onclick="switchForm('register'); return false;">أنشئ واحداً الآن</a>
+        <div class="switch-text">ليس لديك حساب؟ 
+          <a href="#" onclick="switchForm('register'); return false;">أنشئ واحداً الآن</a>
         </div>
       </div>
 
@@ -64,19 +61,19 @@
         <h2>أنشئ حسابك</h2>
         <div class="input-group">
           <label for="register-name">الاسم الكامل</label>
-          <input type="text" id="register-name" placeholder="أدخل اسمك الكامل" required>
+          <input type="text" id="register-name" required>
         </div>
         <div class="input-group">
           <label for="register-email">البريد الإلكتروني</label>
-          <input type="email" id="register-email" placeholder="example@email.com" required>
+          <input type="email" id="register-email" required>
         </div>
         <div class="input-group">
           <label for="register-password">كلمة المرور</label>
-          <input type="password" id="register-password" placeholder="••••••••" required>
+          <input type="password" id="register-password" required>
         </div>
         <button type="button" onclick="handleRegister()">إنشاء الحساب</button>
-        <div class="switch-text">
-          لديك حساب؟ <a href="#" onclick="switchForm('login'); return false;">سجل الدخول</a>
+        <div class="switch-text">لديك حساب؟ 
+          <a href="#" onclick="switchForm('login'); return false;">سجل الدخول</a>
         </div>
       </div>
     </div>
@@ -85,9 +82,7 @@
   <!-- Firebase SDK v8 -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-
   <script>
-    // إعدادات Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyBq45NTkOCdirrGjwPqv_kUJ7tibyThJww",
       authDomain: "soft-ff1e8.firebaseapp.com",
@@ -97,77 +92,39 @@
       appId: "1:17443109810:web:c72598153a7b82ba3042ab",
       measurementId: "G-NR4LP6M583"
     };
-
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
     function switchForm(formType) {
-      const loginForm = document.querySelector('.login-form');
-      const registerForm = document.querySelector('.register-form');
-      const loginTab = document.querySelectorAll('.tab')[0];
-      const registerTab = document.querySelectorAll('.tab')[1];
-
-      if (formType === 'login') {
-        loginForm.classList.add('active');
-        registerForm.classList.remove('active');
-        loginTab.classList.add('active');
-        registerTab.classList.remove('active');
-      } else {
-        registerForm.classList.add('active');
-        loginForm.classList.remove('active');
-        registerTab.classList.add('active');
-        loginTab.classList.remove('active');
-      }
+      document.querySelector('.login-form').classList.toggle('active', formType === 'login');
+      document.querySelector('.register-form').classList.toggle('active', formType === 'register');
+      document.querySelectorAll('.tab')[0].classList.toggle('active', formType === 'login');
+      document.querySelectorAll('.tab')[1].classList.toggle('active', formType === 'register');
     }
 
-    // تسجيل مستخدم جديد
     function handleRegister() {
       const name = document.getElementById('register-name').value;
       const email = document.getElementById('register-email').value;
       const password = document.getElementById('register-password').value;
-
-      if (!name || !email || !password) {
-        alert('الرجاء تعبئة جميع الحقول');
-        return;
-      }
-
+      if (!name || !email || !password) { alert('الرجاء تعبئة جميع الحقول'); return; }
       auth.createUserWithEmailAndPassword(email, password)
-        .then(userCredential => {
-          alert("✅ تم إنشاء الحساب: " + userCredential.user.email);
-        })
-        .catch(error => {
-          alert("❌ خطأ: " + error.message);
-        });
+        .then(() => { window.location.href = "home.html"; })
+        .catch(error => { alert("❌ " + error.message); });
     }
 
-    // تسجيل الدخول
     function handleLogin() {
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
-
-      if (!email || !password) {
-        alert('الرجاء إدخال البريد وكلمة المرور');
-        return;
-      }
-
+      if (!email || !password) { alert('الرجاء إدخال البريد وكلمة المرور'); return; }
       auth.signInWithEmailAndPassword(email, password)
-        .then(userCredential => {
-          alert("🎉 مرحباً " + userCredential.user.email + "، تم تسجيل الدخول بنجاح");
-        })
-        .catch(error => {
-          alert("❌ خطأ: " + error.message);
-        });
+        .then(() => { window.location.href = "home.html"; })
+        .catch(error => { alert("❌ " + error.message); });
     }
 
-    // مراقبة حالة تسجيل الدخول
+    // إذا المستخدم مسجل من قبل → يذهب مباشرة لـ home.html
     auth.onAuthStateChanged(user => {
-      if (user) {
-        console.log("مستخدم مسجل:", user.email);
-      } else {
-        console.log("لا يوجد مستخدم مسجل دخول");
-      }
+      if (user) window.location.href = "home.html";
     });
   </script>
-
 </body>
 </html>
