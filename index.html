@@ -105,4 +105,111 @@
     import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey:"AIzaSy
+      apiKey:"AIzaSyBq45NTkOCdirrGjwPqv_kUJ7tibyThJww",
+      authDomain:"soft-ff1e8.firebaseapp.com",
+      projectId:"soft-ff1e8",
+      storageBucket:"soft-ff1e8.appspot.com",
+      messagingSenderId:"17443109810",
+      appId:"1:17443109810:web:c72598153a7b82ba3042ab",
+      measurementId:"G-NR4LP6M583"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const loginMessage = document.getElementById('loginMessage');
+    const registerMessage = document.getElementById('registerMessage');
+    const formContainer = document.getElementById('formContainer');
+    const registerBtn = document.getElementById('registerBtn');
+    const passwordRules = document.getElementById('passwordRules');
+    const toggleModeBtn = document.querySelector('.toggle-mode');
+
+    // ------------------ حالة تسجيل الدخول -----------------
+    onAuthStateChanged(auth, (user) => {
+      if(user){
+        // إذا المستخدم مسجل دخول، انتقل مباشرة إلى الصفحة الرئيسية
+        window.location.href = "home.html";
+      }
+    });
+
+    window.showRegister = () => { formContainer.classList.add('show-register'); loginMessage.style.display='none'; }
+    window.showLogin = () => { formContainer.classList.remove('show-register'); registerMessage.style.display='none'; }
+
+    window.togglePassword = (id, btn) => {
+      const input = document.getElementById(id);
+      const icon = btn.querySelector('i');
+      if(input.type==="password"){ input.type="text"; icon.classList.replace('fa-eye','fa-eye-slash'); }
+      else{ input.type="password"; icon.classList.replace('fa-eye-slash','fa-eye'); }
+    }
+
+    window.checkPassword = val => {
+      updateRule('lengthRule', val.length>=8);
+      updateRule('upperRule', /[A-Z]/.test(val));
+      updateRule('numberRule', /[0-9]/.test(val));
+      passwordRules.classList.toggle('show', val.length>0);
+      registerBtn.disabled = !(val.length>=8 && /[A-Z]/.test(val) && /[0-9]/.test(val));
+    }
+
+    function updateRule(id, valid){
+      const rule=document.getElementById(id);
+      if(valid){ rule.classList.replace('invalid','valid'); rule.querySelector('i').classList.replace('fa-circle','fa-check-circle'); }
+      else{ rule.classList.replace('valid','invalid'); rule.querySelector('i').classList.replace('fa-check-circle','fa-circle'); }
+    }
+
+    window.login = async () => {
+      const email=document.getElementById("loginEmail").value;
+      const pass=document.getElementById("loginPassword").value;
+      try{
+        await signInWithEmailAndPassword(auth,email,pass);
+        showMessage(loginMessage,"تم تسجيل الدخول بنجاح","success");
+        setTimeout(()=>window.location.href="home.html",1500);
+      }catch(e){ showMessage(loginMessage,"خطأ: "+e.message,"error"); }
+    }
+
+    window.register = async () => {
+      const name=document.getElementById("registerName").value;
+      const email=document.getElementById("registerEmail").value;
+      const pass=document.getElementById("registerPassword").value;
+      if(!(pass.length>=8 && /[A-Z]/.test(pass) && /[0-9]/.test(pass))){
+        showMessage(registerMessage,"كلمة المرور لا تستوفي الشروط","error"); return;
+      }
+      try{
+        const userCredential = await createUserWithEmailAndPassword(auth,email,pass);
+        const user = userCredential.user;
+        if(auth.currentUser){
+          await setDoc(doc(db,"users",user.uid),{ name,email,darkMode:document.body.classList.contains("dark") });
+          showMessage(registerMessage,"تم إنشاء الحساب بنجاح","success");
+          setTimeout(()=>showLogin(),1500);
+        }else{
+          showMessage(registerMessage,"حدث خطأ أثناء تسجيل الدخول تلقائياً","error");
+        }
+      }catch(e){ showMessage(registerMessage,"خطأ: "+e.message,"error"); }
+    }
+
+    window.resetPassword = async () => {
+      const email = prompt("أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور:");
+      if(email){
+        try{ await sendPasswordResetEmail(auth,email); alert("تم إرسال رابط إعادة التعيين"); }
+        catch(e){ alert("خطأ: "+e.message); }
+      }
+    }
+
+    window.toggleMode = () => {
+      document.body.classList.toggle("dark");
+      if(document.body.classList.contains("dark")){
+        toggleModeBtn.innerHTML='<i class="fas fa-sun"></i> تبديل الوضع النهاري';
+      }else{
+        toggleModeBtn.innerHTML='<i class="fas fa-moon"></i> تبديل الوضع الليلي';
+      }
+    }
+
+    function showMessage(element,text,type){
+      element.textContent=text;
+      element.className=`message ${type} fade-in`;
+      element.style.display='block';
+      setTimeout(()=>{ element.style.display='none'; },5000);
+    }
+  </script>
+</body>
+</html>
