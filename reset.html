@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>إعادة تعيين كلمة المرور</title>
+  <style>
+    body{ font-family: Tahoma, sans-serif; background:#f0f2f5; display:flex; align-items:center; justify-content:center; height:100vh; }
+    .box{ background:#fff; padding:20px; border-radius:10px; width:320px; box-shadow:0 8px 20px rgba(0,0,0,0.1);}
+    h2{ margin:0 0 10px; color:#3a3b57; }
+    input{ width:100%; padding:10px; border:1px solid #ccc; border-radius:8px; margin:10px 0;}
+    button{ width:100%; padding:10px; background:#3a3b57; color:#fff; border:none; border-radius:8px; cursor:pointer;}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>إعادة تعيين كلمة المرور</h2>
+    <input type="email" id="resetEmail" placeholder="أدخل بريدك الإلكتروني" required>
+    <button onclick="resetPassword()">إرسال رابط إعادة التعيين</button>
+    <p id="msg" style="color:red; font-size:13px;"></p>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script>
+    const firebaseConfig = { /* انسخ نفس إعدادات firebase من كودك */ };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    function resetPassword(){
+      const email = document.getElementById('resetEmail').value;
+      const msg = document.getElementById('msg');
+      auth.sendPasswordResetEmail(email)
+        .then(()=> msg.style.color="green", msg.textContent="تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك")
+        .catch(err=> msg.textContent=err.message);
+    }
+  </script>
+</body>
+</html>
