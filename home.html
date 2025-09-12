@@ -65,10 +65,12 @@
 
     // عرض اسم أو إيميل المستخدم
     auth.onAuthStateChanged(user => {
-      if(user) {
-        document.getElementById("welcomeMsg").innerText = "مرحباً " + (user.displayName || user.email);
+      if (user) {
+        document.getElementById("welcomeMsg").innerText = 
+          "مرحباً " + (user.displayName || user.email);
       } else {
-        window.location.href = "home.html";
+        // لو مش مسجل يدخل يرجعه لصفحة الدخول
+        window.location.href = "index.html";
       }
     });
 
