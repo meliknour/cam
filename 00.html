@@ -1,99 +1,56 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8" />
-  <title>نظام نتائج المتربصين في آخر لجنة</title>
-  <style>
-    body{font-family:"Tahoma",sans-serif;background:#f9f9f9;text-align:center;padding:40px}
-    h2{color:#333}
-    #result{margin-top:22px;padding:18px;border-radius:10px;background:#fff;box-shadow:0 0 8px rgba(0,0,0,.1);display:inline-block;min-width:320px;text-align:right}
-    .not-found{color:#c62828;font-weight:bold}
-    .ok{color:#2e7d32;font-weight:bold}
-    .muted{color:#777}
-  </style>
-</head>
-<body>
-  <h2>🔎 نتائج المتربصين</h2>
-  <div id="result"></div>
+<!-- settings.html -->
+<form id="settingsForm">
+  <input type="text" id="firstName" placeholder="الاسم">
+  <input type="text" id="lastName" placeholder="اللقب">
+  <label>
+    <input type="checkbox" id="darkMode"> تفعيل الوضع الليلي
+  </label>
+  <button type="submit">حفظ</button>
+</form>
 
-  <script>
-    const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTQqR_h8x3sFfLJCcOUpV4bvWJYTceaXW1DWedcvBGRocmFU81AcMlYJ4lb6CTY4T4pHpM7gf3ZbdWP/pub?gid=0&single=true&output=csv";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-firestore.js";
 
-    let rows = [];
+  // 🔹 ضع بيانات مشروعك هنا
+  const firebaseConfig = {
+    apiKey: "...",
+    authDomain: "...",
+    projectId: "...",
+  };
 
-    const clean = (v) => (v || "").replace(/^"|"$/g, "").replace(/\r/g, "").trim();
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-    function normalizeCommittee(c) {
-      c = clean(c);
-      const m = c.match(/^(\d{4})-(\d{1,2})$/);
-      if (m) return `${m[1]}-${m[2].padStart(2, "0")}`;
-      return c;
+  const form = document.getElementById("settingsForm");
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
     }
 
-    fetch(sheetUrl)
-      .then((r) => r.text())
-      .then((csvText) => {
-        const raw = csvText.split("\n").map((line) => line.split(","));
-        const data = raw.slice(1);
+    const userRef = doc(db, "users", user.uid);
+    const snap = await getDoc(userRef);
 
-        rows = data.map((r) => {
-          const number = clean(r[0]);
-          const name = clean(r[1]);
-          const activity = clean(r[2]);
-          const activityCode = clean(r[3]);
-          const status = clean(r[4]);
-          const committee = normalizeCommittee(r[5]);
-          const searchKey = committee && number ? `${committee}-${number}` : "";
-          return { number, name, activity, activityCode, status, committee, searchKey };
-        }).filter(r => r.number || r.name);
-
-        // ✅ إذا فيه باراميتر في الرابط، ابحث مباشرة
-        const urlParam = decodeURIComponent(window.location.search.substring(1)).trim();
-        if (urlParam) {
-          search(urlParam);
-        } else {
-          document.getElementById("result").innerHTML =
-            "<p class='not-found'>⚠️ الرجاء إدخال الكود عبر الرابط مثل <br> ?2025-08-1</p>";
-        }
-      })
-      .catch(() => {
-        document.getElementById("result").innerHTML =
-          "<p class='not-found'>🚨 تعذر تحميل البيانات من Google Sheets</p>";
-      });
-
-    function search(input) {
-      const resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = "";
-
-      let match = null;
-
-      if (input.includes("-")) {
-        const parts = input.split("-");
-        if (parts.length >= 3) {
-          const normalizedMid = parts[1].padStart(2, "0");
-          const normalizedInput = `${parts[0]}-${normalizedMid}-${parts.slice(2).join("-")}`;
-          match = rows.find(r => r.searchKey === input || r.searchKey === normalizedInput);
-        } else {
-          match = rows.find(r => r.searchKey === input);
-        }
-      } else {
-        match = rows.find(r => r.number === input);
-      }
-
-      if (match) {
-        resultDiv.innerHTML = `
-          <p class="ok">✅ تم العثور على السجل</p>
-          <p><strong>الكود:</strong> ${match.searchKey || `<span class="muted">غير متاح</span>`}</p>
-          <p><strong>الاسم واللقب:</strong> ${match.name}</p>
-          <p><strong>النشاط:</strong> ${match.activity}</p>
-          <p><strong>الحالة:</strong> ${match.status}</p>
-          <p><strong>اللجنة:</strong> ${match.committee || `<span class="muted">غير محددة</span>`}</p>
-        `;
-      } else {
-        resultDiv.innerHTML = "<p class='not-found'>❌ لم يتم العثور على هذا الإدخال</p>";
-      }
+    if (snap.exists()) {
+      document.getElementById("firstName").value = snap.data().firstName || "";
+      document.getElementById("lastName").value = snap.data().lastName || "";
+      document.getElementById("darkMode").checked = snap.data().darkMode || false;
     }
-  </script>
-</body>
-</html>
 
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      await setDoc(userRef, {
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        darkMode: document.getElementById("darkMode").checked
+      }, { merge: true });
+
+      alert("✅ تم حفظ الإعدادات بنجاح");
+    });
+  });
+</script>
