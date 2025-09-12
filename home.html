@@ -6,64 +6,77 @@
   <title>الصفحة الرئيسية</title>
   <style>
     body {
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      color: white; text-align: center;
-      min-height: 100vh; display:flex; flex-direction:column; justify-content:center; align-items:center;
+      font-family: 'Tahoma', sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
-    .card {
-      background: rgba(255,255,255,0.1);
-      padding: 30px; border-radius: 20px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    .container {
+      background: #fff;
+      width: 400px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      padding: 20px;
+      text-align: center;
     }
-    h1 {margin-bottom:20px;}
+    h2 {
+      color: #3a3b57;
+    }
     button {
-      padding:14px 28px; margin-top:20px;
-      background:#ff4d4d; border:none; border-radius:12px;
-      color:white; font-size:1.1rem; font-weight:600; cursor:pointer;
-      transition:0.3s;
+      margin-top: 15px;
+      padding: 10px 15px;
+      background: #3a3b57;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
     }
-    button:hover {background:#e63b3b;}
+    button:hover {
+      background: #2e2f45;
+    }
   </style>
 </head>
 <body>
 
-  <div class="card">
-    <h1>👋 أهلاً بك</h1>
-    <p id="user-email">جاري تحميل بريدك...</p>
+  <div class="container">
+    <h2 id="welcomeMsg">مرحباً!</h2>
     <button onclick="logout()">تسجيل الخروج</button>
   </div>
 
-  <!-- Firebase SDK v8 -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script>
     const firebaseConfig = {
-      apiKey: "AIzaSyBq45NTkOCdirrGjwPqv_kUJ7tibyThJww",
-      authDomain: "soft-ff1e8.firebaseapp.com",
-      projectId: "soft-ff1e8",
-      storageBucket: "soft-ff1e8.appspot.com",
-      messagingSenderId: "17443109810",
-      appId: "1:17443109810:web:c72598153a7b82ba3042ab",
-      measurementId: "G-NR4LP6M583"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
+    // عرض اسم أو إيميل المستخدم
     auth.onAuthStateChanged(user => {
-      if (user) {
-        document.getElementById("user-email").innerText = "📧 بريدك: " + user.email;
+      if(user) {
+        document.getElementById("welcomeMsg").innerText = "مرحباً " + (user.displayName || user.email);
       } else {
-        window.location.href = "index.html"; // لو مافي تسجيل يرجعه
+        window.location.href = "index.html";
       }
     });
 
+    // تسجيل الخروج
     function logout() {
       auth.signOut().then(() => {
         window.location.href = "index.html";
       });
     }
   </script>
-
 </body>
 </html>
