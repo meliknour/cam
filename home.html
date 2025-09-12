@@ -1,85 +1,57 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>الصفحة الرئيسية</title>
-  <style>
-    body {
-      font-family: 'Tahoma', sans-serif;
-      background: #f0f2f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .container {
-      background: #fff;
-      width: 400px;
-      border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-      padding: 20px;
-      text-align: center;
-    }
-    h2 {
-      color: #3a3b57;
-    }
-    button {
-      margin-top: 15px;
-      padding: 10px 15px;
-      background: #3a3b57;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    button:hover {
-      background: #2e2f45;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الصفحة الرئيسية</title>
+    <style>
+        body { font-family: 'Tahoma', sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .container { background: #fff; width: 400px; border-radius: 12px; box-shadow: 0 0 15px rgba(0,0,0,0.2); padding: 20px; text-align: center; }
+        h2 { color: #3a3b57; }
+        button { margin-top: 15px; padding: 10px 15px; background: #3a3b57; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        button:hover { background: #2e2f45; }
+    </style>
 </head>
 <body>
 
-  <div class="container">
-    <h2 id="welcomeMsg">مرحباً!</h2>
-    <button onclick="logout()">تسجيل الخروج</button>
-  </div>
+    <div class="container">
+        <h2 id="welcomeMsg">مرحباً!</h2>
+        <button id="logoutBtn">تسجيل الخروج</button>
+    </div>
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBq45NTkOCdirrGjwPqv_kUJ7tibyThJww",
-      authDomain: "soft-ff1e8.firebaseapp.com",
-      projectId: "soft-ff1e8",
-      storageBucket: "soft-ff1e8.appspot.com",
-      messagingSenderId: "17443109810",
-      appId: "1:17443109810:web:c72598153a7b82ba3042ab",
-      measurementId: "G-NR4LP6M583"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script>
+        // إعدادات Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBq45NTkOCdirrGjwPqv_kUJ7tibyThJww",
+            authDomain: "soft-ff1e8.firebaseapp.com",
+            projectId: "soft-ff1e8",
+            storageBucket: "soft-ff1e8.appspot.com",
+            messagingSenderId: "17443109810",
+            appId: "1:17443109810:web:c72598153a7b82ba3042ab",
+            measurementId: "G-NR4LP6M583"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const logoutBtn = document.getElementById("logoutBtn");
 
-    // عرض اسم أو إيميل المستخدم
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        document.getElementById("welcomeMsg").innerText = 
-          "مرحباً " + (user.displayName || user.email);
-      } else {
-        // لو مش مسجل يدخل يرجعه لصفحة الدخول
-        window.location.href = "index.html";
-      }
-    });
+        // عرض اسم أو إيميل المستخدم
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                document.getElementById("welcomeMsg").innerText = "مرحباً " + (user.displayName || user.email);
+            } else {
+                // إذا لم يكن هناك مستخدم مسجل، قم بإعادة التوجيه
+                window.location.href = "index.html";
+            }
+        });
 
-    // تسجيل الخروج
-    function logout() {
-      auth.signOut().then(() => {
-        window.location.href = "index.html";
-      });
-    }
-  </script>
+        // تسجيل الخروج
+        logoutBtn.onclick = () => {
+            auth.signOut().then(() => {
+                // لا حاجة للانتقال هنا، onAuthStateChanged سيتعامل معها
+            });
+        };
+    </script>
 </body>
 </html>
