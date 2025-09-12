@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تسجيل / دخول</title>
+  <title>تسجيل الدخول / إنشاء حساب</title>
   <style>
     body {
       font-family: 'Tahoma', sans-serif;
@@ -16,28 +16,30 @@
     }
     .container {
       background: #fff;
-      width: 350px;
+      width: 400px;
       border-radius: 12px;
       box-shadow: 0 0 15px rgba(0,0,0,0.2);
       padding: 20px;
     }
     .tabs {
       display: flex;
-      justify-content: space-between;
+      justify-content: space-around;
       margin-bottom: 20px;
     }
-    .tab {
+    .tabs button {
       flex: 1;
-      text-align: center;
       padding: 10px;
+      border: none;
+      border-radius: 8px;
       cursor: pointer;
       font-weight: bold;
-      border-bottom: 2px solid transparent;
-      transition: 0.3s;
-    }
-    .tab.active {
-      border-bottom: 2px solid #3a3b57;
+      background: #e4e6eb;
       color: #3a3b57;
+      margin: 0 5px;
+    }
+    .tabs button.active {
+      background: #3a3b57;
+      color: #fff;
     }
     form {
       display: none;
@@ -49,29 +51,24 @@
     input {
       margin: 8px 0;
       padding: 10px;
-      border: 1px solid #ccc;
       border-radius: 8px;
+      border: 1px solid #ccc;
     }
-    .checkbox {
-      display: flex;
-      align-items: center;
-      margin: 5px 0;
-    }
-    .checkbox input {
-      margin-left: 5px;
-    }
-    button {
-      margin-top: 10px;
-      padding: 10px;
+    button.submit {
       background: #3a3b57;
       color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
+      margin-top: 10px;
     }
-    button:hover {
+    button.submit:hover {
       background: #2e2f45;
+    }
+    .show-password {
+      font-size: 12px;
+      margin-top: -5px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      color: #3a3b57;
+      text-align: right;
     }
     .note {
       font-size: 12px;
@@ -85,38 +82,27 @@
 
   <div class="container">
     <div class="tabs">
-      <div class="tab active" onclick="showForm('login')">تسجيل الدخول</div>
-      <div class="tab" onclick="showForm('signup')">إنشاء حساب</div>
+      <button id="loginTab" class="active">تسجيل الدخول</button>
+      <button id="registerTab">إنشاء حساب</button>
     </div>
 
-    <!-- تسجيل الدخول -->
+    <!-- نموذج تسجيل الدخول -->
     <form id="loginForm" class="active">
       <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" required>
       <input type="password" id="loginPassword" placeholder="كلمة المرور" required>
-      
-      <div class="checkbox">
-        <input type="checkbox" onclick="togglePassword('loginPassword')"> 
-        <label>إظهار كلمة المرور</label>
-      </div>
-
-      <button type="submit">دخول</button>
+      <div class="show-password" onclick="togglePassword('loginPassword')">👁 عرض/إخفاء</div>
+      <button type="button" class="submit" onclick="login()">دخول</button>
     </form>
 
-    <!-- التسجيل -->
-    <form id="signupForm">
-      <input type="text" id="fullName" placeholder="الاسم الكامل" required>
-      <input type="email" id="signupEmail" placeholder="البريد الإلكتروني" required>
-      <input type="password" id="signupPassword" placeholder="كلمة المرور" required>
-      <input type="password" id="confirmPassword" placeholder="تأكيد كلمة المرور" required>
-
-      <div class="checkbox">
-        <input type="checkbox" onclick="togglePassword('signupPassword'); togglePassword('confirmPassword')"> 
-        <label>إظهار كلمة المرور</label>
-      </div>
-
-      <div class="note">بإنشائك حساب فأنت توافق على <a href="#">الشروط</a></div>
-
-      <button type="submit">تسجيل</button>
+    <!-- نموذج التسجيل -->
+    <form id="registerForm">
+      <input type="text" id="regName" placeholder="الاسم الكامل" required>
+      <input type="email" id="regEmail" placeholder="البريد الإلكتروني" required>
+      <input type="password" id="regPassword" placeholder="كلمة المرور" required>
+      <input type="password" id="regConfirm" placeholder="تأكيد كلمة المرور" required>
+      <div class="show-password" onclick="togglePassword('regPassword');togglePassword('regConfirm')">👁 عرض/إخفاء</div>
+      <button type="button" class="submit" onclick="register()">تسجيل</button>
+      <div class="note">بإنشاء حساب فأنت توافق على الشروط</div>
     </form>
   </div>
 
@@ -124,7 +110,6 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script>
-    // ضع بيانات مشروعك هنا
     const firebaseConfig = {
       apiKey: "AIzaSyBq45NTkOCdirrGjwPqv_kUJ7tibyThJww",
       authDomain: "soft-ff1e8.firebaseapp.com",
@@ -137,18 +122,25 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // تبديل النماذج
-    function showForm(type) {
-      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-      document.querySelectorAll("form").forEach(f => f.classList.remove("active"));
-      if(type === "login") {
-        document.querySelector("#loginForm").classList.add("active");
-        document.querySelectorAll(".tab")[0].classList.add("active");
-      } else {
-        document.querySelector("#signupForm").classList.add("active");
-        document.querySelectorAll(".tab")[1].classList.add("active");
-      }
-    }
+    // تبويبات
+    const loginTab = document.getElementById("loginTab");
+    const registerTab = document.getElementById("registerTab");
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+
+    loginTab.onclick = () => {
+      loginTab.classList.add("active");
+      registerTab.classList.remove("active");
+      loginForm.classList.add("active");
+      registerForm.classList.remove("active");
+    };
+
+    registerTab.onclick = () => {
+      registerTab.classList.add("active");
+      loginTab.classList.remove("active");
+      registerForm.classList.add("active");
+      loginForm.classList.remove("active");
+    };
 
     // إظهار/إخفاء كلمة المرور
     function togglePassword(id) {
@@ -156,44 +148,48 @@
       input.type = input.type === "password" ? "text" : "password";
     }
 
-    // تسجيل الدخول
-    document.getElementById("loginForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const email = document.getElementById("loginEmail").value;
-      const password = document.getElementById("loginPassword").value;
-      auth.signInWithEmailAndPassword(email, password)
-        .then(() => {
-          window.location.href = "home.html";
-        })
-        .catch(err => alert("خطأ: " + err.message));
-    });
+    // تسجيل مستخدم جديد
+    function register() {
+      const name = document.getElementById("regName").value.trim();
+      const email = document.getElementById("regEmail").value;
+      const pass = document.getElementById("regPassword").value;
+      const confirm = document.getElementById("regConfirm").value;
 
-    // إنشاء حساب
-    document.getElementById("signupForm").addEventListener("submit", (e) => {
-      e.preventDefault();
-      const name = document.getElementById("fullName").value;
-      const email = document.getElementById("signupEmail").value;
-      const password = document.getElementById("signupPassword").value;
-      const confirm = document.getElementById("confirmPassword").value;
-
-      if(password !== confirm) {
-        alert("كلمتا المرور غير متطابقتين");
+      if (pass !== confirm) {
+        alert("كلمة المرور غير متطابقة");
         return;
       }
 
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(userCredential => {
-          return userCredential.user.updateProfile({ displayName: name });
+      auth.createUserWithEmailAndPassword(email, pass)
+        .then(result => {
+          return result.user.updateProfile({ displayName: name });
         })
+        .then(() => {
+          alert("تم إنشاء الحساب بنجاح");
+          window.location.href = "home.html";
+        })
+        .catch(error => {
+          alert(error.message);
+        });
+    }
+
+    // تسجيل الدخول
+    function login() {
+      const email = document.getElementById("loginEmail").value;
+      const pass = document.getElementById("loginPassword").value;
+
+      auth.signInWithEmailAndPassword(email, pass)
         .then(() => {
           window.location.href = "home.html";
         })
-        .catch(err => alert("خطأ: " + err.message));
-    });
+        .catch(error => {
+          alert(error.message);
+        });
+    }
 
-    // إذا كان المستخدم مسجل بالفعل → يروح مباشرة للصفحة الرئيسية
+    // متابعة حالة المستخدم
     auth.onAuthStateChanged(user => {
-      if(user) {
+      if (user) {
         window.location.href = "home.html";
       }
     });
