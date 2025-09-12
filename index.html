@@ -2,128 +2,199 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>تسجيل الدخول / إنشاء حساب</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل / دخول</title>
   <style>
-    * {margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
     body {
-      background: linear-gradient(135deg, #667eea, #764ba2);
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px;
+      font-family: 'Tahoma', sans-serif;
+      background: #f0f2f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
     }
-    .auth-container {background: white; width: 100%; max-width: 420px; border-radius: 24px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); overflow: hidden;}
-    .tabs {display: flex; background: #f8f9fa; border-bottom: 1px solid #eee;}
-    .tab {flex:1; padding:18px 10px; text-align:center; font-size:1.1rem; font-weight:600; color:#666; cursor:pointer; transition:all 0.3s;}
-    .tab.active {color:#667eea; background:white; border-bottom:3px solid #667eea;}
-    .form-container {padding:28px 24px; min-height:420px;}
-    .form {display:none; animation:fadeIn 0.5s ease;}
-    .form.active {display:block;}
-    @keyframes fadeIn {from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
-    .form h2 {font-size:1.5rem; color:#333; text-align:center; margin-bottom:32px; font-weight:700;}
-    .input-group {margin-bottom:24px;}
-    label {display:block; margin-bottom:8px; font-size:1rem; color:#444; font-weight:500;}
-    input {width:100%; padding:16px; border:2px solid #e1e5e9; border-radius:14px; font-size:1.05rem; outline:none; transition:border-color 0.3s; background:#fafafa;}
-    input:focus {border-color:#667eea; background:white;}
-    button {width:100%; padding:18px; background:#667eea; color:white; border:none; border-radius:14px; font-size:1.1rem; font-weight:600; cursor:pointer; margin-top:10px; transition:background 0.3s;}
-    button:hover {background:#5a6fd8;}
-    .switch-text {text-align:center; margin-top:28px; font-size:1rem; color:#777;}
-    .switch-text a {color:#667eea; text-decoration:none; font-weight:600;}
+    .container {
+      background: #fff;
+      width: 350px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      padding: 20px;
+    }
+    .tabs {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      border-bottom: 2px solid transparent;
+      transition: 0.3s;
+    }
+    .tab.active {
+      border-bottom: 2px solid #3a3b57;
+      color: #3a3b57;
+    }
+    form {
+      display: none;
+      flex-direction: column;
+    }
+    form.active {
+      display: flex;
+    }
+    input {
+      margin: 8px 0;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    .checkbox {
+      display: flex;
+      align-items: center;
+      margin: 5px 0;
+    }
+    .checkbox input {
+      margin-left: 5px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      background: #3a3b57;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background: #2e2f45;
+    }
+    .note {
+      font-size: 12px;
+      color: #555;
+      margin-top: 5px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
 
-  <div class="auth-container">
+  <div class="container">
     <div class="tabs">
-      <div class="tab active" onclick="switchForm('login')">تسجيل الدخول</div>
-      <div class="tab" onclick="switchForm('register')">إنشاء حساب</div>
+      <div class="tab active" onclick="showForm('login')">تسجيل الدخول</div>
+      <div class="tab" onclick="showForm('signup')">إنشاء حساب</div>
     </div>
 
-    <div class="form-container">
-      <!-- Login Form -->
-      <div class="form login-form active">
-        <h2>مرحباً بك مجدداً</h2>
-        <div class="input-group">
-          <label for="login-email">البريد الإلكتروني</label>
-          <input type="email" id="login-email" required>
-        </div>
-        <div class="input-group">
-          <label for="login-password">كلمة المرور</label>
-          <input type="password" id="login-password" required>
-        </div>
-        <button type="button" onclick="handleLogin()">تسجيل الدخول</button>
-        <div class="switch-text">ليس لديك حساب؟ 
-          <a href="#" onclick="switchForm('register'); return false;">أنشئ واحداً الآن</a>
-        </div>
+    <!-- تسجيل الدخول -->
+    <form id="loginForm" class="active">
+      <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" required>
+      <input type="password" id="loginPassword" placeholder="كلمة المرور" required>
+      
+      <div class="checkbox">
+        <input type="checkbox" onclick="togglePassword('loginPassword')"> 
+        <label>إظهار كلمة المرور</label>
       </div>
 
-      <!-- Register Form -->
-      <div class="form register-form">
-        <h2>أنشئ حسابك</h2>
-        <div class="input-group">
-          <label for="register-name">الاسم الكامل</label>
-          <input type="text" id="register-name" required>
-        </div>
-        <div class="input-group">
-          <label for="register-email">البريد الإلكتروني</label>
-          <input type="email" id="register-email" required>
-        </div>
-        <div class="input-group">
-          <label for="register-password">كلمة المرور</label>
-          <input type="password" id="register-password" required>
-        </div>
-        <button type="button" onclick="handleRegister()">إنشاء الحساب</button>
-        <div class="switch-text">لديك حساب؟ 
-          <a href="#" onclick="switchForm('login'); return false;">سجل الدخول</a>
-        </div>
+      <button type="submit">دخول</button>
+    </form>
+
+    <!-- التسجيل -->
+    <form id="signupForm">
+      <input type="text" id="fullName" placeholder="الاسم الكامل" required>
+      <input type="email" id="signupEmail" placeholder="البريد الإلكتروني" required>
+      <input type="password" id="signupPassword" placeholder="كلمة المرور" required>
+      <input type="password" id="confirmPassword" placeholder="تأكيد كلمة المرور" required>
+
+      <div class="checkbox">
+        <input type="checkbox" onclick="togglePassword('signupPassword'); togglePassword('confirmPassword')"> 
+        <label>إظهار كلمة المرور</label>
       </div>
-    </div>
+
+      <div class="note">بإنشائك حساب فأنت توافق على <a href="#">الشروط</a></div>
+
+      <button type="submit">تسجيل</button>
+    </form>
   </div>
 
-  <!-- Firebase SDK v8 -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script>
+    // ضع بيانات مشروعك هنا
     const firebaseConfig = {
-      apiKey: "AIzaSyBq45NTkOCdirrGjwPqv_kUJ7tibyThJww",
-      authDomain: "soft-ff1e8.firebaseapp.com",
-      projectId: "soft-ff1e8",
-      storageBucket: "soft-ff1e8.appspot.com",
-      messagingSenderId: "17443109810",
-      appId: "1:17443109810:web:c72598153a7b82ba3042ab",
-      measurementId: "G-NR4LP6M583"
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    function switchForm(formType) {
-      document.querySelector('.login-form').classList.toggle('active', formType === 'login');
-      document.querySelector('.register-form').classList.toggle('active', formType === 'register');
-      document.querySelectorAll('.tab')[0].classList.toggle('active', formType === 'login');
-      document.querySelectorAll('.tab')[1].classList.toggle('active', formType === 'register');
+    // تبديل النماذج
+    function showForm(type) {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll("form").forEach(f => f.classList.remove("active"));
+      if(type === "login") {
+        document.querySelector("#loginForm").classList.add("active");
+        document.querySelectorAll(".tab")[0].classList.add("active");
+      } else {
+        document.querySelector("#signupForm").classList.add("active");
+        document.querySelectorAll(".tab")[1].classList.add("active");
+      }
     }
 
-    function handleRegister() {
-      const name = document.getElementById('register-name').value;
-      const email = document.getElementById('register-email').value;
-      const password = document.getElementById('register-password').value;
-      if (!name || !email || !password) { alert('الرجاء تعبئة جميع الحقول'); return; }
-      auth.createUserWithEmailAndPassword(email, password)
-        .then(() => { window.location.href = "home.html"; })
-        .catch(error => { alert("❌ " + error.message); });
+    // إظهار/إخفاء كلمة المرور
+    function togglePassword(id) {
+      const input = document.getElementById(id);
+      input.type = input.type === "password" ? "text" : "password";
     }
 
-    function handleLogin() {
-      const email = document.getElementById('login-email').value;
-      const password = document.getElementById('login-password').value;
-      if (!email || !password) { alert('الرجاء إدخال البريد وكلمة المرور'); return; }
+    // تسجيل الدخول
+    document.getElementById("loginForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
       auth.signInWithEmailAndPassword(email, password)
-        .then(() => { window.location.href = "home.html"; })
-        .catch(error => { alert("❌ " + error.message); });
-    }
+        .then(() => {
+          window.location.href = "home.html";
+        })
+        .catch(err => alert("خطأ: " + err.message));
+    });
 
-    // إذا المستخدم مسجل من قبل → يذهب مباشرة لـ home.html
+    // إنشاء حساب
+    document.getElementById("signupForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("fullName").value;
+      const email = document.getElementById("signupEmail").value;
+      const password = document.getElementById("signupPassword").value;
+      const confirm = document.getElementById("confirmPassword").value;
+
+      if(password !== confirm) {
+        alert("كلمتا المرور غير متطابقتين");
+        return;
+      }
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(userCredential => {
+          return userCredential.user.updateProfile({ displayName: name });
+        })
+        .then(() => {
+          window.location.href = "home.html";
+        })
+        .catch(err => alert("خطأ: " + err.message));
+    });
+
+    // إذا كان المستخدم مسجل بالفعل → يروح مباشرة للصفحة الرئيسية
     auth.onAuthStateChanged(user => {
-      if (user) window.location.href = "home.html";
+      if(user) {
+        window.location.href = "home.html";
+      }
     });
   </script>
 </body>
