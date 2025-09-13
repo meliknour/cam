@@ -293,17 +293,26 @@
       setTimeout(() => { element.style.display = 'none'; }, 5000);
     }
 
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const userDoc = await getDoc(doc(db, "users", user.uid));
-          if (userDoc.exists() && userDoc.data().darkMode) {
-            document.body.classList.add("dark");
-            toggleModeBtn.innerHTML = '<i class="fas fa-sun"></i> تبديل الوضع النهاري';
-          }
-        } catch (e) { console.error("Error loading user preferences:", e); }
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    // ✅ المستخدم مسجل دخول → روح مباشرة للصفحة الرئيسية
+    if (window.location.pathname.includes("index.html")) {
+      window.location.href = "home.html";
+      return;
+    }
+
+    try {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (userDoc.exists() && userDoc.data().darkMode) {
+        document.body.classList.add("dark");
+        toggleModeBtn.innerHTML = '<i class="fas fa-sun"></i> تبديل الوضع النهاري';
       }
-    });
+    } catch (e) { 
+      console.error("Error loading user preferences:", e); 
+    }
+  }
+});
+
   </script>
 </body>
 </html>
