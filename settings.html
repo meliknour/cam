@@ -2,145 +2,134 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>الإعدادات</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body {
-      font-family: sans-serif;
-      background: #f0f2f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      background:#f0f2f5;
+      margin:0; padding:20px;
     }
-    .card {
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      width: 320px;
-      text-align: center;
+    body.dark { background:#18191a; color:#e4e6eb; }
+    .container {
+      max-width:500px; margin:auto; background:#fff; padding:20px; border-radius:12px;
+      box-shadow:0 4px 15px rgba(0,0,0,0.1);
     }
+    body.dark .container { background:#242526; }
+    h2 { text-align:center; color:#3a3b57; }
+    body.dark h2 { color:#9aa0a6; }
+    .input-group { margin-bottom:15px; }
+    label { display:block; margin-bottom:6px; font-weight:bold; }
     input {
-      display: block;
-      width: 100%;
-      margin: 10px 0;
-      padding: 8px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      width:100%; padding:10px; border:1px solid #ccc; border-radius:8px; font-size:14px;
     }
     button {
-      background: #3a3b57;
-      color: #fff;
-      border: none;
-      padding: 10px;
-      width: 100%;
-      border-radius: 8px;
-      cursor: pointer;
+      width:100%; padding:12px; border:none; border-radius:8px;
+      background:#3a3b57; color:#fff; font-weight:bold; cursor:pointer; margin-top:10px;
     }
-    button:hover {
-      background: #2e2f45;
-    }
-    img {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      margin: 10px auto;
-      object-fit: cover;
-      display: block;
-    }
+    .toggle-mode { text-align:center; margin:15px; cursor:pointer; color:#3a3b57; }
+    body.dark .toggle-mode { color:#9aa0a6; }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h2>إعدادات الحساب</h2>
-    <img id="profilePic" src="https://via.placeholder.com/80" alt="صورة المستخدم">
-    <input type="file" id="fileInput" accept="image/*">
-    <input type="text" id="nameInput" placeholder="اكتب اسمك">
-    <button id="saveBtn">💾 حفظ التغييرات</button>
-    <p id="status"></p>
+  <div class="container">
+    <h2>الإعدادات</h2>
+
+    <div class="input-group">
+      <label>الاسم</label>
+      <input type="text" id="name">
+    </div>
+
+    <div class="input-group">
+      <label>البريد الإلكتروني</label>
+      <input type="email" id="email" disabled>
+    </div>
+
+    <div class="input-group">
+      <label>كلمة المرور الجديدة</label>
+      <input type="password" id="newPassword" placeholder="اتركه فارغ إذا لا تريد التغيير">
+    </div>
+
+    <button onclick="saveSettings()">💾 حفظ التغييرات</button>
+    <button onclick="logout()">🚪 تسجيل الخروج</button>
+
+    <div class="toggle-mode" onclick="toggleMode()">
+      <i class="fas fa-moon"></i> تبديل الوضع الليلي
+    </div>
   </div>
 
   <script type="module">
-    // Firebase
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-    import { getAuth, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
+    import { getAuth, updatePassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    // config
     const firebaseConfig = {
       apiKey: "AIzaSyBq45NTkOCdirrGjwPqv_kUJ7tibyThJww",
       authDomain: "soft-ff1e8.firebaseapp.com",
       projectId: "soft-ff1e8",
       storageBucket: "soft-ff1e8.appspot.com",
       messagingSenderId: "17443109810",
-      appId: "1:17443109810:web:xxxx"
+      appId: "1:17443109810:web:c72598153a7b82ba3042ab"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
-    const nameInput = document.getElementById("nameInput");
-    const fileInput = document.getElementById("fileInput");
-    const saveBtn = document.getElementById("saveBtn");
-    const statusEl = document.getElementById("status");
-    const profilePic = document.getElementById("profilePic");
+    const nameInput = document.getElementById("name");
+    const emailInput = document.getElementById("email");
+    const newPasswordInput = document.getElementById("newPassword");
 
-    let selectedFile = null;
-
-    fileInput.addEventListener("change", (e) => {
-      selectedFile = e.target.files[0];
-      if (selectedFile) {
-        profilePic.src = URL.createObjectURL(selectedFile);
-      }
-    });
-
+    // تحميل بيانات المستخدم
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // عرض البيانات الحالية من Firestore
-        const docRef = doc(db, "users", user.uid);
-        const snap = await getDoc(docRef);
-        if (snap.exists()) {
-          const data = snap.data();
-          if (data.name) nameInput.value = data.name;
-          if (data.photoURL) profilePic.src = data.photoURL;
+        emailInput.value = user.email;
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          nameInput.value = userDoc.data().name || "";
+          if (userDoc.data().darkMode) {
+            document.body.classList.add("dark");
+          }
         }
       } else {
-        window.location.href = "index.html"; // رجوع لصفحة الدخول لو ما في مستخدم
+        window.location.href = "index.html"; // إذا مو مسجل يرجع لتسجيل الدخول
       }
     });
 
-    saveBtn.addEventListener("click", async () => {
+    // حفظ التغييرات
+    window.saveSettings = async () => {
       const user = auth.currentUser;
       if (!user) return;
 
-      statusEl.textContent = "جاري الحفظ...";
-      let photoURL = null;
+      const newName = nameInput.value;
+      const newPassword = newPasswordInput.value;
 
-      if (selectedFile) {
-        // رفع الصورة لـ Firebase Storage
-        const storageRef = ref(storage, `users/${user.uid}/profile.jpg`);
-        await uploadBytes(storageRef, selectedFile);
-        photoURL = await getDownloadURL(storageRef);
+      // تحديث الاسم في Firestore
+      await setDoc(doc(db, "users", user.uid), { name: newName }, { merge: true });
+
+      // تحديث كلمة المرور إذا أدخل جديدة
+      if (newPassword) {
+        await updatePassword(user, newPassword);
+        alert("تم تحديث كلمة المرور");
       }
 
-      // حفظ البيانات في Firestore
-      await setDoc(doc(db, "users", user.uid), {
-        name: nameInput.value,
-        photoURL: photoURL || profilePic.src
-      }, { merge: true });
+      alert("تم حفظ الإعدادات بنجاح ✅");
+    };
 
-      // تحديث ملف المستخدم في Auth
-      await updateProfile(user, {
-        displayName: nameInput.value,
-        photoURL: photoURL || user.photoURL
-      });
+    // تبديل الوضع الليلي
+    window.toggleMode = async () => {
+      document.body.classList.toggle("dark");
+      const user = auth.currentUser;
+      if (user) {
+        await setDoc(doc(db, "users", user.uid), { darkMode: document.body.classList.contains("dark") }, { merge: true });
+      }
+    };
 
-      statusEl.textContent = "✅ تم الحفظ بنجاح";
-    });
+    // تسجيل الخروج
+    window.logout = async () => {
+      await signOut(auth);
+      window.location.href = "index.html";
+    };
   </script>
 </body>
 </html>
