@@ -2,140 +2,61 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>مشروعي</title>
-
-  <!-- Google Material Icons -->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-
+  <title>الصفحة الرئيسية</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
     body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f0f2f5;
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      margin:0; padding:0;
+      background:#f0f2f5; color:#333;
     }
-
-    /* النافبار العلوي */
-    .navbar {
-      position: fixed;
-      top: 0;
-      right: 0;
-      left: 0;
-      height: 55px;
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      background: #fff;
-      border-bottom: 1px solid #ccc;
-      z-index: 1000;
-    }
-
-    .navbar a {
-      text-decoration: none;
-      color: #3a3b57;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      font-size: 12px;
-      flex: 1;
-    }
-
-    .navbar a .material-icons {
-      font-size: 24px;
-      margin-bottom: 2px;
-    }
-
-    .navbar a.active {
-      color: #1877f2;
-    }
-
-    /* الوضع الليلي */
     body.dark {
-      background: #18191a;
-      color: #e4e6eb;
+      background:#18191a; color:#e4e6eb;
     }
 
-    body.dark .navbar {
-      background: #242526;
-      border-bottom: 1px solid #3a3b57;
+    /* Navbar */
+    .navbar {
+      display:flex; justify-content:space-between; align-items:center;
+      background:#3a3b57; color:#fff; padding:10px 20px;
+      position:fixed; top:0; left:0; right:0; z-index:1000;
     }
-
-    body.dark .navbar a {
-      color: #e4e6eb;
+    .navbar .logo { font-size:18px; font-weight:bold; }
+    .navbar .nav-icons {
+      display:flex; gap:20px;
     }
-
-    body.dark .navbar a.active {
-      color: #2d88ff;
+    .navbar .nav-icons a {
+      color:#fff; text-decoration:none; font-size:20px;
     }
-
-    /* منيو الإعدادات */
-    #settingsMenu {
-      display: none;
-      position: fixed;
-      top: 60px;
-      left: 10px;
-      background: #fff;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      z-index: 1100;
-    }
-
-    body.dark #settingsMenu {
-      background: #242526;
-      color: #e4e6eb;
-    }
-
-    #settingsMenu button {
-      display: block;
-      width: 100%;
-      padding: 8px;
-      margin: 5px 0;
-      border: none;
-      background: #1877f2;
-      color: #fff;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-    }
-
-    #settingsMenu button:hover {
-      background: #165ec9;
-    }
-
-    /* المحتوى */
     .content {
-      padding: 70px 20px 20px;
+      margin-top:70px; padding:20px;
+      text-align:center;
+    }
+    .welcome {
+      font-size:22px; font-weight:bold; margin-bottom:20px;
     }
   </style>
 </head>
 <body>
-
-  <!-- النافبار -->
   <div class="navbar">
-    <a href="#" class="active"><span class="material-icons">home</span>الرئيسية</a>
-    <a href="#"><span class="material-icons">notifications</span>الإشعارات</a>
-    <a href="#"><span class="material-icons">mail</span>الرسائل</a>
-    <a href="#"><span class="material-icons">photo_library</span>المعارض</a>
-    <a href="#" onclick="toggleMenu()"><span class="material-icons">settings</span>الإعدادات</a>
+    <div class="logo">موقعي</div>
+    <div class="nav-icons">
+      <a href="home.html" title="الرئيسية"><i class="fas fa-home"></i></a>
+      <a href="#" title="الإشعارات"><i class="fas fa-bell"></i></a>
+      <a href="#" title="الرسائل"><i class="fas fa-envelope"></i></a>
+      <a href="#" title="المعارض"><i class="fas fa-images"></i></a>
+      <a href="settings.html" title="الإعدادات"><i class="fas fa-cog"></i></a>
+    </div>
   </div>
 
-  <!-- قائمة الإعدادات -->
-  <div id="settingsMenu">
-    <button onclick="toggleDarkMode()">🌙 الوضع الليلي/النهاري</button>
-    <button onclick="logout()">🚪 تسجيل الخروج</button>
-  </div>
-
-  <!-- المحتوى -->
   <div class="content">
-    <h2 id="welcomeMsg">مرحباً!</h2>
-    <p>هذا هو محتوى الصفحة الرئيسية...</p>
+    <div class="welcome">أهلًا، <span id="userName">...</span> 👋</div>
+    <p>هذه الصفحة الرئيسية الخاصة بك.</p>
   </div>
 
-  <!-- Firebase -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBq45NTkOCdirrGjwPqv_kUJ7tibyThJww",
@@ -143,42 +64,31 @@
       projectId: "soft-ff1e8",
       storageBucket: "soft-ff1e8.appspot.com",
       messagingSenderId: "17443109810",
-      appId: "1:17443109810:web:c72598153a7b82ba3042ab",
-      measurementId: "G-NR4LP6M583"
+      appId: "1:17443109810:web:c72598153a7b82ba3042ab"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    // تحقق من حالة تسجيل الدخول
-    onAuthStateChanged(auth, (user) => {
+    const userName = document.getElementById("userName");
+
+    onAuthStateChanged(auth, async (user) => {
       if (user) {
-        document.getElementById("welcomeMsg").innerText = "مرحباً " + (user.displayName || user.email);
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          userName.textContent = data.name || user.email;
+          if (data.darkMode) {
+            document.body.classList.add("dark");
+          }
+        } else {
+          userName.textContent = user.email;
+        }
       } else {
-        window.location.href = "index.html"; // إذا لم يكن مسجل
+        window.location.href = "index.html"; // لو مش مسجل يدخل صفحة تسجيل الدخول
       }
     });
-
-    // إظهار/إخفاء المنيو
-    window.toggleMenu = function() {
-      const menu = document.getElementById('settingsMenu');
-      menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
-    }
-
-    // تبديل الوضع الليلي
-    window.toggleDarkMode = function() {
-      document.body.classList.toggle('dark');
-    }
-
-    // تسجيل الخروج
-    window.logout = function() {
-      signOut(auth).then(() => {
-        window.location.href = "index.html";
-      }).catch((error) => {
-        alert("خطأ في تسجيل الخروج: " + error.message);
-      });
-    }
   </script>
-
 </body>
 </html>
