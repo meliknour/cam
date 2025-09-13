@@ -236,17 +236,13 @@
       const email = document.getElementById("loginEmail").value;
       const pass = document.getElementById("loginPassword").value;
       if (!email || !pass) { showMessage(loginMessage, "يرجى ملء جميع الحقول", "error"); return; }
-      try {
-        loginBtn.innerHTML = '<span class="loading"></span> جاري تسجيل الدخول...';
-        loginBtn.disabled = true;
-        await signInWithEmailAndPassword(auth, email, pass);
-        showMessage(loginMessage, "تم تسجيل الدخول بنجاح", "success");
-        window.location.href = "home.html"; // ✅ مباشر بدون تأخير
-      } catch(e) { 
-        loginBtn.innerHTML = 'تسجيل الدخول'; loginBtn.disabled = false;
-        showMessage(loginMessage, "خطأ: " + e.message, "error"); 
-      }
-    };
+    try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    window.location.href = "home.html"; // ✅ دخول مباشر جداً بدون أي رسائل أو انتظار
+  } catch(e) { 
+    showMessage(loginMessage, "خطأ: " + e.message, "error"); 
+  }
+};
 
     window.register = async () => {
       const name = document.getElementById("registerName").value;
