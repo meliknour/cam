@@ -181,11 +181,11 @@
         const user = userCredential.user;
 
         // ✅ إنشاء مستند Firestore مباشرة باستخدام user.uid
-        await setDoc(doc(db,"users",user.uid), {
-          name,
-          email,
-          darkMode: document.body.classList.contains("dark")
-        });
+await setDoc(doc(db, "users", user.uid), {
+  name: name,
+  email: email,
+  darkMode: document.body.classList.contains("dark")
+});
 
         showMessage(registerMessage,"تم إنشاء الحساب بنجاح","success");
 
