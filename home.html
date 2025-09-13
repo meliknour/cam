@@ -1,3 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>الصفحة الرئيسية</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-light: #f0f2f5;
+      --bg-dark: #18191a;
+      --card-light: #fff;
+      --card-dark: #242526;
+      --text-light: #000;
+      --text-dark: #e4e6eb;
+      --primary: #3a3b57;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg-light);
+      color: var(--text-light);
+      transition: background 0.3s, color 0.3s;
+    }
+    body.dark {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    /* الناف بار */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      color: #fff;
+      z-index: 1000;
+    }
+    .navbar a {
+      color: #fff;
+      text-decoration: none;
+      font-size: 20px;
+    }
+
+    /* القائمة المنبثقة */
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 0;
+      background: var(--card-light);
+      color: var(--text-light);
+      min-width: 200px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+      z-index: 1001;
+    }
+    body.dark .dropdown-menu {
+      background: var(--card-dark);
+      color: var(--text-dark);
+    }
+    .dropdown-menu a, 
+    .dropdown-menu button {
+      display: block;
+      width: 100%;
+      padding: 12px;
+      text-align: right;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      color: inherit;
+    }
+    .dropdown-menu a:hover,
+    .dropdown-menu button:hover {
+      background: rgba(0,0,0,0.05);
+    }
+
+    .show { display: block; }
+
+    /* المحتوى */
+    .content {
+      margin-top: 80px;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <!-- ناف بار -->
+  <div class="navbar">
+    <a href="home.html" title="الرئيسية"><i class="fas fa-home"></i></a>
+    <a href="#" title="الإشعارات"><i class="fas fa-bell"></i></a>
+    <a href="#" title="الرسائل"><i class="fas fa-envelope"></i></a>
+    <a href="#" title="المعرض"><i class="fas fa-images"></i></a>
+
+    <!-- قائمة الإعدادات -->
+    <div class="dropdown">
+      <a href="#" id="settingsBtn" title="الإعدادات"><i class="fas fa-cog"></i></a>
+      <div class="dropdown-menu" id="settingsMenu">
+        <a href="settings.html"><i class="fas fa-sliders-h"></i> إعدادات الخصوصية</a>
+        <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- المحتوى -->
+  <div class="content">
+    <h1>مرحباً بك في الصفحة الرئيسية</h1>
+    <p>هذا مثال على الصفحة الرئيسية مع ناف بار وقائمة إعدادات منبثقة.</p>
+  </div>
+
 <script type="module">
   // Firebase
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
@@ -90,3 +212,6 @@
     }
   });
 </script>
+
+</body>
+</html>
