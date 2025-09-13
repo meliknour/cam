@@ -5,63 +5,196 @@
   <title>الإعدادات</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    :root{
+      --primary:#3a3b57;
+      --bg-light:#f0f2f5;
+      --bg-dark:#18191a;
+      --card-light:#fff;
+      --card-dark:#242526;
+      --text-light:#111;
+      --text-dark:#e4e6eb;
+    }
+
     body {
       font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
-      background:#f0f2f5;
-      margin:0; padding:20px;
+      background: var(--bg-light);
+      color: var(--text-light);
+      margin: 0;
     }
-    body.dark { background:#18191a; color:#e4e6eb; }
+    body.dark {
+      background: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    /* ===== Navbar (مثل الهوم) ===== */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      gap: 8px;
+      z-index: 1100;
+    }
+    .nav-left, .nav-right { display:flex; align-items:center; gap:12px; }
+    .nav-left .logo { color:#fff; font-weight:700; font-size:18px; }
+    .nav-right a, .nav-right button {
+      color: #fff;
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .nav-right a { text-decoration: none; }
+
+    /* Dropdown */
+    .dropdown { position: relative; }
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: 60px;
+      right: 0;
+      background: var(--card-light);
+      color: var(--text-light);
+      min-width: 220px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+      border-radius: 8px;
+      overflow: hidden;
+      z-index: 1200;
+    }
+    body.dark .dropdown-menu { background: var(--card-dark); color: var(--text-dark); }
+    .dropdown-menu a, .dropdown-menu button {
+      display:block;
+      width:100%;
+      padding:12px 14px;
+      text-align: right;
+      background:none;
+      border:none;
+      color:inherit;
+      font-size:15px;
+      cursor:pointer;
+    }
+    .dropdown-menu a:hover, .dropdown-menu button:hover {
+      background: rgba(0,0,0,0.05);
+    }
+    .dropdown.show .dropdown-menu { display:block; }
+
+    /* ===== Container (محتوى الصفحة) ===== */
+    .page {
+      padding: 80px 20px 30px; /* مسافة من النافبار */
+      display: flex;
+      justify-content: center;
+    }
     .container {
-      max-width:500px; margin:auto; background:#fff; padding:20px; border-radius:12px;
-      box-shadow:0 4px 15px rgba(0,0,0,0.1);
+      max-width:500px;
+      width:100%;
+      background: var(--card-light);
+      padding:20px;
+      border-radius:12px;
+      box-shadow:0 4px 15px rgba(0,0,0,0.08);
     }
-    body.dark .container { background:#242526; }
-    h2 { text-align:center; color:#3a3b57; }
+    body.dark .container { background: var(--card-dark); box-shadow:0 4px 15px rgba(0,0,0,0.18); }
+
+    h2 { text-align:center; color:var(--primary); margin-top:0; }
     body.dark h2 { color:#9aa0a6; }
+
     .input-group { margin-bottom:15px; }
-    label { display:block; margin-bottom:6px; font-weight:bold; }
+    label { display:block; margin-bottom:6px; font-weight:600; }
     input {
-      width:100%; padding:10px; border:1px solid #ccc; border-radius:8px; font-size:14px;
+      width:100%;
+      padding:10px;
+      border:1px solid #ccc;
+      border-radius:8px;
+      font-size:14px;
+      box-sizing:border-box;
+      background:transparent;
+      color:inherit;
     }
-    button {
-      width:100%; padding:12px; border:none; border-radius:8px;
-      background:#3a3b57; color:#fff; font-weight:bold; cursor:pointer; margin-top:10px;
+    body.dark input { border-color:#3a3b57; }
+
+    .actions { display:flex; gap:10px; margin-top:10px; flex-direction:column; }
+    .actions button {
+      width:100%;
+      padding:12px;
+      border:none;
+      border-radius:8px;
+      background:var(--primary);
+      color:#fff;
+      font-weight:700;
+      cursor:pointer;
     }
-    .toggle-mode { text-align:center; margin:15px; cursor:pointer; color:#3a3b57; }
+    .toggle-mode { text-align:center; margin-top:12px; cursor:pointer; color:var(--primary); }
     body.dark .toggle-mode { color:#9aa0a6; }
+
+    @media (max-width:480px) {
+      .container { padding:16px; }
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>الإعدادات</h2>
-
-    <div class="input-group">
-      <label>الاسم</label>
-      <input type="text" id="name">
+  <!-- NAVBAR -->
+  <div class="navbar">
+    <div class="nav-left">
+      <div class="logo">موقعي</div>
     </div>
 
-    <div class="input-group">
-      <label>البريد الإلكتروني</label>
-      <input type="email" id="email" disabled>
+    <div class="nav-right">
+      <a href="home.html" title="الرئيسية"><i class="fas fa-home"></i></a>
+      <a href="#" title="الإشعارات"><i class="fas fa-bell"></i></a>
+      <a href="#" title="الرسائل"><i class="fas fa-envelope"></i></a>
+
+      <!-- إعدادات (قائمة منبثقة) -->
+      <div class="dropdown" id="navDropdown">
+        <a href="#" id="settingsBtn" title="الإعدادات"><i class="fas fa-cog"></i></a>
+        <div class="dropdown-menu" id="settingsMenu">
+          <a href="settings.html"><i class="fas fa-sliders-h"></i> إعدادات الخصوصية</a>
+          <button type="button" id="navToggleMode"><i class="fas fa-moon"></i> تبديل الوضع</button>
+          <button type="button" id="navLogout"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div class="input-group">
-      <label>كلمة المرور الجديدة</label>
-      <input type="password" id="newPassword" placeholder="اتركه فارغ إذا لا تريد التغيير">
-    </div>
+  <!-- الصفحة -->
+  <div class="page">
+    <div class="container">
+      <h2>الإعدادات</h2>
 
-    <button onclick="saveSettings()">💾 حفظ التغييرات</button>
-    <button onclick="logout()">🚪 تسجيل الخروج</button>
+      <div class="input-group">
+        <label>الاسم</label>
+        <input type="text" id="name">
+      </div>
 
-    <div class="toggle-mode" onclick="toggleMode()">
-      <i class="fas fa-moon"></i> تبديل الوضع الليلي
+      <div class="input-group">
+        <label>البريد الإلكتروني</label>
+        <input type="email" id="email" disabled>
+      </div>
+
+      <div class="input-group">
+        <label>كلمة المرور الجديدة</label>
+        <input type="password" id="newPassword" placeholder="اتركه فارغ إذا لا تريد التغيير">
+      </div>
+
+      <div class="actions">
+        <button onclick="saveSettings()">💾 حفظ التغييرات</button>
+        <button onclick="logout()">🚪 تسجيل الخروج</button>
+      </div>
+
+      <div class="toggle-mode" onclick="toggleMode()">
+        <i class="fas fa-moon"></i> تبديل الوضع الليلي
+      </div>
     </div>
   </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import { getAuth, updatePassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBq45NTkOCdirrGjwPqv_kUJ7tibyThJww",
@@ -80,56 +213,130 @@
     const emailInput = document.getElementById("email");
     const newPasswordInput = document.getElementById("newPassword");
 
-    // تحميل بيانات المستخدم
+    // ===== تحميل بيانات المستخدم وتطبيق darkMode من جدول users =====
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        emailInput.value = user.email;
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          nameInput.value = userDoc.data().name || "";
-          if (userDoc.data().darkMode) {
-            document.body.classList.add("dark");
+        emailInput.value = user.email || "";
+        try {
+          const userRef = doc(db, "users", user.uid);
+          const userSnap = await getDoc(userRef);
+          if (userSnap.exists()) {
+            const data = userSnap.data();
+            nameInput.value = data.name || "";
+            if (data.darkMode) {
+              document.body.classList.add("dark");
+            } else {
+              document.body.classList.remove("dark");
+            }
           }
+        } catch (err) {
+          console.error("Error loading user doc:", err);
         }
       } else {
         window.location.href = "index.html"; // إذا مو مسجل يرجع لتسجيل الدخول
       }
     });
 
-    // حفظ التغييرات
+    // ===== حفظ التغييرات (الاسم + كلمة المرور) =====
     window.saveSettings = async () => {
       const user = auth.currentUser;
-      if (!user) return;
+      if (!user) return alert("خطأ: المستخدم غير متاح");
 
-      const newName = nameInput.value;
+      const newName = nameInput.value.trim();
       const newPassword = newPasswordInput.value;
 
-      // تحديث الاسم في Firestore
-      await setDoc(doc(db, "users", user.uid), { name: newName }, { merge: true });
+      try {
+        // تحديث الاسم في Firestore
+        if (newName !== "") {
+          await setDoc(doc(db, "users", user.uid), { name: newName }, { merge: true });
+        }
 
-      // تحديث كلمة المرور إذا أدخل جديدة
-      if (newPassword) {
-        await updatePassword(user, newPassword);
-        alert("تم تحديث كلمة المرور");
+        // تحديث كلمة المرور (ملاحظة: قد يتطلب إعادة تحقق)
+        if (newPassword) {
+          await updatePassword(user, newPassword);
+          alert("تم تحديث كلمة المرور");
+        }
+
+        alert("تم حفظ الإعدادات بنجاح ✅");
+      } catch (err) {
+        console.error(err);
+        alert("حصل خطأ أثناء الحفظ: " + (err.message || err));
       }
-
-      alert("تم حفظ الإعدادات بنجاح ✅");
     };
 
-    // تبديل الوضع الليلي
+    // ===== تبديل الوضع (يحفظ في جدول users) =====
     window.toggleMode = async () => {
-      document.body.classList.toggle("dark");
       const user = auth.currentUser;
-      if (user) {
-        await setDoc(doc(db, "users", user.uid), { darkMode: document.body.classList.contains("dark") }, { merge: true });
+      if (!user) {
+        // لو المستخدم غير متاح نغير المظهر محليًا فقط
+        document.body.classList.toggle("dark");
+        return;
+      }
+
+      try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        const current = userSnap.exists() ? !!userSnap.data().darkMode : false;
+        const newMode = !current;
+
+        // تحديث في Firestore
+        await updateDoc(userRef, { darkMode: newMode });
+
+        // تطبيق على الواجهة فورًا
+        if (newMode) document.body.classList.add("dark");
+        else document.body.classList.remove("dark");
+      } catch (err) {
+        console.error("toggleMode error:", err);
+        // كخطة احتياطية غيّر محليًا
+        document.body.classList.toggle("dark");
       }
     };
 
-    // تسجيل الخروج
+    // ===== تسجيل الخروج =====
     window.logout = async () => {
-      await signOut(auth);
-      window.location.href = "index.html";
+      try {
+        await signOut(auth);
+        window.location.href = "index.html";
+      } catch (err) {
+        console.error("Logout error:", err);
+        alert("خطأ في تسجيل الخروج: " + (err.message || err));
+      }
     };
+
+    // ===== قائمة الإعدادات في النافبار (عرض/إخفاء) =====
+    const navDropdown = document.getElementById("navDropdown");
+    const settingsBtn = document.getElementById("settingsBtn");
+    const settingsMenu = document.getElementById("settingsMenu");
+    const navToggleMode = document.getElementById("navToggleMode");
+    const navLogout = document.getElementById("navLogout");
+
+    // منع تنفيذ inline link الافتراضي
+    settingsBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      navDropdown.classList.toggle("show");
+    });
+
+    // زر تبديل الوضع في القائمة
+    navToggleMode.addEventListener("click", (e) => {
+      e.preventDefault();
+      // استدعاء الدالة العالمية
+      if (typeof window.toggleMode === "function") window.toggleMode();
+      // اغلاق القائمة
+      navDropdown.classList.remove("show");
+    });
+
+    // زر تسجيل الخروج في القائمة (يستخدم window.logout)
+    navLogout.addEventListener("click", (e) => {
+      e.preventDefault();
+      if (typeof window.logout === "function") window.logout();
+    });
+
+    // إخفاء القائمة عند الضغط خارجها
+    window.addEventListener("click", (e) => {
+      if (!navDropdown.contains(e.target)) {
+        navDropdown.classList.remove("show");
+      }
+    });
   </script>
 </body>
 </html>
