@@ -445,6 +445,7 @@
         } else {
           throw new Error("فشل في إنشاء مستند المستخدم");
         }
+setTimeout(()=> showLogin(), 1500); // يعطي وقت للـ Firestore لإنشاء المستند
 
       } catch(e) { 
         registerBtn.innerHTML = 'إنشاء حساب';
