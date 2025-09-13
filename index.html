@@ -45,14 +45,10 @@
       display:flex; 
       flex-direction:column; 
     }
-    body.dark .card { 
-      box-shadow:0 4px 15px rgba(0,0,0,0.3); 
-    }
     h2 { 
       margin:0 0 20px; 
       color:var(--primary); 
       text-align:center; 
-      transition:var(--transition); 
     }
     .form-container { 
       position:relative; 
@@ -64,255 +60,58 @@
       width:100%; 
       transition:all 0.4s cubic-bezier(0.68,-0.55,0.27,1.55); 
     }
-    #loginForm { 
-      left:0; 
-      opacity:1; 
-      transform:translateX(0); 
-    }
-    #registerForm { 
-      left:0; 
-      opacity:0; 
-      transform:translateX(100%); 
-    }
-    .show-register #loginForm { 
-      opacity:0; 
-      transform:translateX(-100%); 
-    }
-    .show-register #registerForm { 
-      opacity:1; 
-      transform:translateX(0); 
-    }
-    .input-group { 
-      margin-bottom:18px; 
-      position:relative; 
-    }
+    #loginForm { left:0; opacity:1; transform:translateX(0); }
+    #registerForm { left:0; opacity:0; transform:translateX(100%); }
+    .show-register #loginForm { opacity:0; transform:translateX(-100%); }
+    .show-register #registerForm { opacity:1; transform:translateX(0); }
+    .input-group { margin-bottom:18px; position:relative; }
     input { 
-      width:90%; 
-      padding:12px 40px 12px 12px; 
-      border:1px solid #ccc; 
-      border-radius:8px; 
-      background:transparent; 
-      color:var(--text); 
-      font-size:15px; 
-      transition:var(--transition); 
+      width:90%; padding:12px 40px 12px 12px; border:1px solid #ccc; border-radius:8px;
+      background:transparent; color:var(--text); font-size:15px; 
     }
-    body.dark input { 
-      border-color:#4e4f50; 
-    }
-    input:focus { 
-      outline:none; 
-      border-color:var(--primary); 
-      box-shadow:0 0 0 2px rgba(58,59,87,0.2); 
-    }
+    input:focus { outline:none; border-color:var(--primary); }
     .toggle-password { 
-      position:absolute; 
-      left:12px; 
-      top:50%; 
-      transform:translateY(-50%); 
-      cursor:pointer; 
-      font-size:16px; 
-      color:#777; 
-      background:none; 
-      border:none; 
-      width:24px; 
-      height:24px; 
-      display:flex; 
-      align-items:center; 
-      justify-content:center; 
-    }
-    body.dark .toggle-password { 
-      color:#b0b3b8; 
+      position:absolute; left:12px; top:50%; transform:translateY(-50%); cursor:pointer; 
+      font-size:16px; color:#777; background:none; border:none;
     }
     button.submit-btn { 
-      width:100%; 
-      padding:12px; 
-      border:none; 
-      border-radius:8px; 
-      background:var(--primary); 
-      color:#fff; 
-      font-weight:bold; 
-      cursor:pointer; 
-      transition:var(--transition); 
-      margin-top:5px; 
-      position: relative;
-      overflow: hidden;
+      width:100%; padding:12px; border:none; border-radius:8px; 
+      background:var(--primary); color:#fff; font-weight:bold; cursor:pointer;
+      margin-top:5px;
     }
-    button.submit-btn:hover { 
-      opacity:0.9; 
-      transform:translateY(-2px); 
-    }
-    .switch { 
-      margin-top:15px; 
-      text-align:center; 
-      font-size:14px; 
-      color:#65676b; 
-    }
-    .switch span { 
-      color:var(--primary); 
-      cursor:pointer; 
-      font-weight:600; 
-      transition:var(--transition); 
-    }
-    .switch span:hover { 
-      text-decoration:underline; 
-    }
-    .toggle-mode { 
-      text-align:center; 
-      margin-top:20px; 
-      font-size:14px; 
-      cursor:pointer; 
-      color:var(--primary); 
-      display:flex; 
-      align-items:center; 
-      justify-content:center; 
-      gap:8px; 
-      transition:var(--transition); 
-    }
-    .toggle-mode:hover { 
-      opacity:0.8; 
-    }
-    .forgot { 
-      text-align:left; 
-      font-size:13px; 
-      margin-top:-10px; 
-      margin-bottom:15px; 
-    }
-    .forgot span { 
-      color:var(--primary); 
-      cursor:pointer; 
-      transition:var(--transition); 
-    }
-    .forgot span:hover { 
-      text-decoration:underline; 
-    }
-    .password-rules { 
-      font-size:12px; 
-      margin-top:-5px; 
-      margin-bottom:15px; 
-      line-height:1.6; 
-      max-height:0; 
-      overflow:hidden; 
-      transition:max-height 0.3s ease; 
-    }
-    .password-rules.show { 
-      max-height:100px; 
-    }
-    .rule { 
-      display:flex; 
-      align-items:center; 
-      gap:6px; 
-      margin-bottom:4px; 
-    }
-    .rule i { 
-      font-size:10px; 
-      transition:var(--transition); 
-    }
-    .rule.valid { 
-      color:var(--success); 
-    }
-    .rule.invalid { 
-      color:var(--error); 
-    }
-    .message { 
-      padding:10px; 
-      border-radius:6px; 
-      margin-bottom:15px; 
-      text-align:center; 
-      display:none; 
-      font-size:14px; 
-      transition:var(--transition); 
-    }
-    .error { 
-      background-color: rgba(217,48,37,0.1); 
-      color:var(--error); 
-      border:1px solid rgba(217,48,37,0.2); 
-    }
-    .success { 
-      background-color: rgba(24,128,56,0.1); 
-      color:var(--success); 
-      border:1px solid rgba(24,128,56,0.2); 
-    }
-    @keyframes fadeIn { 
-      from { opacity:0; transform:translateY(-10px); } 
-      to { opacity:1; transform:translateY(0); } 
-    }
-    .fade-in { 
-      animation:fadeIn 0.5s ease forwards; 
-    }
-    .loading {
-      display: inline-block;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255,255,255,.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-      margin-right: 10px;
-    }
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    .progress-bar {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      height: 4px;
-      background: var(--primary);
-      width: 0%;
-      transition: width 3s linear;
-      border-radius: 0 0 8px 8px;
-    }
+    .switch { margin-top:15px; text-align:center; font-size:14px; color:#65676b; }
+    .switch span { color:var(--primary); cursor:pointer; font-weight:600; }
+    .toggle-mode { text-align:center; margin-top:20px; font-size:14px; cursor:pointer; color:var(--primary); }
+    .forgot { text-align:left; font-size:13px; margin-top:-10px; margin-bottom:15px; }
+    .forgot span { color:var(--primary); cursor:pointer; }
+    .password-rules { font-size:12px; margin-bottom:15px; display:none; }
+    .rule { display:flex; align-items:center; gap:6px; margin-bottom:4px; }
+    .rule.valid { color:var(--success); }
+    .rule.invalid { color:var(--error); }
+    .message { padding:10px; border-radius:6px; margin-bottom:15px; text-align:center; display:none; font-size:14px; }
+    .error { background-color: rgba(217,48,37,0.1); color:var(--error); }
+    .success { background-color: rgba(24,128,56,0.1); color:var(--success); }
     .processing-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(255, 255, 255, 0.9);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-      border-radius: 12px;
-      opacity: 0;
-      visibility: hidden;
-      transition: all 0.3s ease;
+      position: absolute; top:0; left:0; right:0; bottom:0;
+      background: rgba(255,255,255,0.9); display:flex; flex-direction:column;
+      justify-content:center; align-items:center; z-index:100; border-radius:12px;
+      opacity:0; visibility:hidden; transition:all 0.3s ease;
     }
-    body.dark .processing-overlay {
-      background: rgba(36, 37, 38, 0.95);
-    }
-    .processing-overlay.active {
-      opacity: 1;
-      visibility: visible;
-    }
+    body.dark .processing-overlay { background: rgba(36,37,38,0.95); }
+    .processing-overlay.active { opacity:1; visibility:visible; }
     .processing-spinner {
-      width: 50px;
-      height: 50px;
-      border: 5px solid rgba(58, 59, 87, 0.2);
-      border-radius: 50%;
-      border-top-color: var(--primary);
-      animation: spin 1s linear infinite;
-      margin-bottom: 20px;
+      width:50px; height:50px; border:5px solid rgba(58,59,87,0.2);
+      border-radius:50%; border-top-color:var(--primary); animation:spin 1s linear infinite;
+      margin-bottom:20px;
     }
-    .processing-text {
-      font-size: 18px;
-      font-weight: bold;
-      color: var(--primary);
-      margin-bottom: 10px;
-    }
-    .countdown {
-      font-size: 24px;
-      font-weight: bold;
-      color: var(--primary);
-    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .countdown { font-size:24px; font-weight:bold; color:var(--primary); }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="processing-overlay" id="processingOverlay">
       <div class="processing-spinner"></div>
-      <div class="processing-text">جاري معالجة طلبك</div>
       <div class="countdown" id="countdown">3</div>
     </div>
     
@@ -369,7 +168,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBq45NTkOCdirrGjwPqv_kUJ7tibyThJww",
@@ -395,15 +194,12 @@
     const processingOverlay = document.getElementById('processingOverlay');
     const countdownElement = document.getElementById('countdown');
 
-    // مؤقت العد التنازلي
     function startCountdown(duration, callback) {
       let timer = duration;
       countdownElement.textContent = timer;
-      
-      const countdownInterval = setInterval(function () {
+      const countdownInterval = setInterval(() => {
         timer--;
         countdownElement.textContent = timer;
-        
         if (timer <= 0) {
           clearInterval(countdownInterval);
           callback();
@@ -411,87 +207,43 @@
       }, 1000);
     }
 
-    // عرض شاشة المعالجة
-    function showProcessing() {
-      processingOverlay.classList.add('active');
-      startCountdown(3, function() {
-        processingOverlay.classList.remove('active');
-      });
-    }
-
-    // ------------------ حالة تسجيل الدخول -----------------
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        console.log("المستخدم مسجل دخوله:", user.uid);
-        // window.location.href = "home.html";
-      }
-    });
-
-    window.showRegister = () => { 
-      formContainer.classList.add('show-register'); 
-      loginMessage.style.display = 'none'; 
-    };
-    
-    window.showLogin = () => { 
-      formContainer.classList.remove('show-register'); 
-      registerMessage.style.display = 'none'; 
-    };
+    window.showRegister = () => { formContainer.classList.add('show-register'); loginMessage.style.display = 'none'; };
+    window.showLogin = () => { formContainer.classList.remove('show-register'); registerMessage.style.display = 'none'; };
 
     window.togglePassword = (id, btn) => {
       const input = document.getElementById(id);
       const icon = btn.querySelector('i');
-      if (input.type === "password") { 
-        input.type = "text"; 
-        icon.classList.replace('fa-eye','fa-eye-slash'); 
-      } else { 
-        input.type = "password"; 
-        icon.classList.replace('fa-eye-slash','fa-eye'); 
-      }
+      if (input.type === "password") { input.type = "text"; icon.classList.replace('fa-eye','fa-eye-slash'); }
+      else { input.type = "password"; icon.classList.replace('fa-eye-slash','fa-eye'); }
     };
 
     window.checkPassword = val => {
       updateRule('lengthRule', val.length >= 8);
       updateRule('upperRule', /[A-Z]/.test(val));
       updateRule('numberRule', /[0-9]/.test(val));
-      passwordRules.classList.toggle('show', val.length > 0);
+      passwordRules.style.display = val.length > 0 ? "block" : "none";
       registerBtn.disabled = !(val.length >= 8 && /[A-Z]/.test(val) && /[0-9]/.test(val));
     };
 
     function updateRule(id, valid) {
       const rule = document.getElementById(id);
-      if (valid) { 
-        rule.classList.replace('invalid','valid'); 
-        rule.querySelector('i').classList.replace('fa-circle','fa-check-circle'); 
-      } else { 
-        rule.classList.replace('valid','invalid'); 
-        rule.querySelector('i').classList.replace('fa-check-circle','fa-circle'); 
-      }
+      rule.className = valid ? "rule valid" : "rule invalid";
+      const icon = rule.querySelector("i");
+      icon.className = valid ? "fas fa-check-circle" : "fas fa-circle";
     }
 
     window.login = async () => {
       const email = document.getElementById("loginEmail").value;
       const pass = document.getElementById("loginPassword").value;
-      
-      if (!email || !pass) {
-        showMessage(loginMessage, "يرجى ملء جميع الحقول", "error");
-        return;
-      }
-      
+      if (!email || !pass) { showMessage(loginMessage, "يرجى ملء جميع الحقول", "error"); return; }
       try {
         loginBtn.innerHTML = '<span class="loading"></span> جاري تسجيل الدخول...';
         loginBtn.disabled = true;
-        
         await signInWithEmailAndPassword(auth, email, pass);
         showMessage(loginMessage, "تم تسجيل الدخول بنجاح", "success");
-        
-        // عرض شاشة المعالجة لمدة 3 ثواني
-        showProcessing();
-        
-        // الانتقال بعد انتهاء المعالجة
-        setTimeout(() => window.location.href = "home.html", 3000);
+        window.location.href = "home.html"; // ✅ مباشر بدون تأخير
       } catch(e) { 
-        loginBtn.innerHTML = 'تسجيل الدخول';
-        loginBtn.disabled = false;
+        loginBtn.innerHTML = 'تسجيل الدخول'; loginBtn.disabled = false;
         showMessage(loginMessage, "خطأ: " + e.message, "error"); 
       }
     };
@@ -500,54 +252,23 @@
       const name = document.getElementById("registerName").value;
       const email = document.getElementById("registerEmail").value;
       const pass = document.getElementById("registerPassword").value;
-
-      if (!name || !email || !pass) {
-        showMessage(registerMessage, "يرجى ملء جميع الحقول", "error");
-        return;
-      }
-
-      // التحقق من صحة كلمة المرور
+      if (!name || !email || !pass) { showMessage(registerMessage, "يرجى ملء جميع الحقول", "error"); return; }
       if (!(pass.length >= 8 && /[A-Z]/.test(pass) && /[0-9]/.test(pass))) {
-        showMessage(registerMessage, "كلمة المرور لا تستوفي الشروط", "error"); 
-        return;
+        showMessage(registerMessage, "كلمة المرور لا تستوفي الشروط", "error"); return;
       }
-
       try {
         registerBtn.innerHTML = '<span class="loading"></span> جاري إنشاء الحساب...';
         registerBtn.disabled = true;
-        
-        // 1. إنشاء المستخدم في Authentication
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
         const user = userCredential.user;
-        console.log("تم إنشاء المستخدم:", user.uid);
-
-        // 2. إنشاء المستند في Firestore
-        try {
-          await setDoc(doc(db, "users", user.uid), {
-            name: name,
-            email: email,
-            darkMode: document.body.classList.contains("dark"),
-            createdAt: new Date()
-          });
-          console.log("تم إنشاء المستند في Firestore");
-        } catch (firestoreError) {
-          console.error("خطأ في إنشاء مستند Firestore:", firestoreError);
-          // حتى لو فشل إنشاء المستند، نستمر في العملية
-        }
-
-        // 3. تسجيل الدخول تلقائيًا
-        await signInWithEmailAndPassword(auth, email, pass);
-        
+        await setDoc(doc(db, "users", user.uid), {
+          name, email, darkMode: document.body.classList.contains("dark"), createdAt: serverTimestamp()
+        });
         showMessage(registerMessage, "تم إنشاء الحساب بنجاح", "success");
-        
-        // عرض شاشة المعالجة لمدة 3 ثواني
-        showProcessing();
-        
-        // الانتقال بعد انتهاء المعالجة
-        setTimeout(() => window.location.href = "home.html", 3000);
+        processingOverlay.classList.add('active');
+        startCountdown(3, () => { processingOverlay.classList.remove('active'); window.location.href = "home.html"; });
       } catch(e) { 
-        registerBtn.innerHTML = 'إنشاء حساب';
-        registerBtn.disabled = false;
+        registerBtn.innerHTML = 'إنشاء حساب'; registerBtn.disabled = false;
         showMessage(registerMessage, "خطأ: " + e.message, "error"); 
       }
     };
@@ -555,42 +276,27 @@
     window.resetPassword = async () => {
       const email = prompt("أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور:");
       if (email) {
-        try { 
-          await sendPasswordResetEmail(auth, email); 
-          alert("تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني"); 
-        } catch(e) { 
-          alert("خطأ: " + e.message); 
-        }
+        try { await sendPasswordResetEmail(auth, email); alert("تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني"); }
+        catch(e) { alert("خطأ: " + e.message); }
       }
     };
 
     window.toggleMode = () => {
       document.body.classList.toggle("dark");
-      if (document.body.classList.contains("dark")) {
-        toggleModeBtn.innerHTML = '<i class="fas fa-sun"></i> تبديل الوضع النهاري';
-      } else {
-        toggleModeBtn.innerHTML = '<i class="fas fa-moon"></i> تبديل الوضع الليلي';
-      }
-      
-      // حفظ تفضيلات الوضع الليلي للمستخدم المسجل
+      toggleModeBtn.innerHTML = document.body.classList.contains("dark") ? 
+        '<i class="fas fa-sun"></i> تبديل الوضع النهاري' : 
+        '<i class="fas fa-moon"></i> تبديل الوضع الليلي';
       const user = auth.currentUser;
-      if (user) {
-        setDoc(doc(db, "users", user.uid), {
-          darkMode: document.body.classList.contains("dark")
-        }, { merge: true }).catch(error => {
-          console.error("خطأ في حفظ تفضيلات الوضع الليلي:", error);
-        });
-      }
+      if (user) setDoc(doc(db, "users", user.uid), { darkMode: document.body.classList.contains("dark") }, { merge: true });
     };
 
     function showMessage(element, text, type) {
       element.textContent = text;
-      element.className = `message ${type} fade-in`;
+      element.className = `message ${type}`;
       element.style.display = 'block';
       setTimeout(() => { element.style.display = 'none'; }, 5000);
     }
 
-    // تحميل تفضيلات الوضع الليلي إذا كان المستخدم مسجلاً
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         try {
@@ -599,14 +305,9 @@
             document.body.classList.add("dark");
             toggleModeBtn.innerHTML = '<i class="fas fa-sun"></i> تبديل الوضع النهاري';
           }
-        } catch (e) {
-          console.error("Error loading user preferences:", e);
-        }
+        } catch (e) { console.error("Error loading user preferences:", e); }
       }
     });
-
-    // إضافة console.log للتصحيح
-    console.log("تم تحميل الصفحة وتكوين Firebase");
   </script>
 </body>
 </html>
