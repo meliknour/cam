@@ -128,7 +128,6 @@
     // ------------------ حالة تسجيل الدخول -----------------
     onAuthStateChanged(auth, (user) => {
       if(user){
-        // إذا المستخدم مسجل دخول، انتقل مباشرة إلى الصفحة الرئيسية
         window.location.href = "home.html";
       }
     });
@@ -171,19 +170,30 @@
       const name=document.getElementById("registerName").value;
       const email=document.getElementById("registerEmail").value;
       const pass=document.getElementById("registerPassword").value;
+
+      // يمكنك إزالة قيود كلمة المرور إذا أردت
       if(!(pass.length>=8 && /[A-Z]/.test(pass) && /[0-9]/.test(pass))){
         showMessage(registerMessage,"كلمة المرور لا تستوفي الشروط","error"); return;
       }
+
       try{
         const userCredential = await createUserWithEmailAndPassword(auth,email,pass);
         const user = userCredential.user;
-        if(auth.currentUser){
-          await setDoc(doc(db,"users",user.uid),{ name,email,darkMode:document.body.classList.contains("dark") });
-          showMessage(registerMessage,"تم إنشاء الحساب بنجاح","success");
-          setTimeout(()=>showLogin(),1500);
-        }else{
-          showMessage(registerMessage,"حدث خطأ أثناء تسجيل الدخول تلقائياً","error");
-        }
+
+        // ✅ إنشاء مستند Firestore مباشرة باستخدام user.uid
+        await setDoc(doc(db,"users",user.uid), {
+          name,
+          email,
+          darkMode: document.body.classList.contains("dark")
+        });
+
+        showMessage(registerMessage,"تم إنشاء الحساب بنجاح","success");
+
+        // تسجيل الدخول تلقائيًا
+        await signInWithEmailAndPassword(auth,email,pass);
+
+        setTimeout(()=>window.location.href="home.html",1500);
+
       }catch(e){ showMessage(registerMessage,"خطأ: "+e.message,"error"); }
     }
 
