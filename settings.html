@@ -137,28 +137,24 @@
   </style>
 </head>
 <body>
-  <!-- NAVBAR -->
-  <div class="navbar">
-    <div class="nav-left">
-      <div class="logo">موقعي</div>
-    </div>
+<!-- ناف بار -->
+<div class="navbar">
+  <a href="home.html" title="الرئيسية"><i class="fas fa-home"></i></a>
+  <a href="#" title="الإشعارات"><i class="fas fa-bell"></i></a>
+  <a href="#" title="الرسائل"><i class="fas fa-envelope"></i></a>
+  <a href="#" title="المعرض"><i class="fas fa-images"></i></a>
 
-    <div class="nav-right">
-      <a href="home.html" title="الرئيسية"><i class="fas fa-home"></i></a>
-      <a href="#" title="الإشعارات"><i class="fas fa-bell"></i></a>
-      <a href="#" title="الرسائل"><i class="fas fa-envelope"></i></a>
-
-      <!-- إعدادات (قائمة منبثقة) -->
-      <div class="dropdown" id="navDropdown">
-        <a href="#" id="settingsBtn" title="الإعدادات"><i class="fas fa-cog"></i></a>
-        <div class="dropdown-menu" id="settingsMenu">
-          <a href="settings.html"><i class="fas fa-sliders-h"></i> إعدادات الخصوصية</a>
-          <button type="button" id="navToggleMode"><i class="fas fa-moon"></i> تبديل الوضع</button>
-          <button type="button" id="navLogout"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
-        </div>
-      </div>
+  <!-- قائمة الإعدادات -->
+  <div class="dropdown">
+    <a href="#" id="settingsBtn" title="الإعدادات"><i class="fas fa-cog"></i></a>
+    <div class="dropdown-menu" id="settingsMenu">
+      <a href="settings.html"><i class="fas fa-sliders-h"></i> إعدادات الخصوصية</a>
+      <button onclick="toggleDarkMode()"><i class="fas fa-moon"></i> تبديل الوضع</button>
+      <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</button>
     </div>
   </div>
+</div>
+
 
   <!-- الصفحة -->
   <div class="page">
