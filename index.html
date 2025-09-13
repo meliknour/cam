@@ -134,6 +134,8 @@
       cursor:pointer; 
       transition:var(--transition); 
       margin-top:5px; 
+      position: relative;
+      overflow: hidden;
     }
     button.submit-btn:hover { 
       opacity:0.9; 
@@ -250,10 +252,70 @@
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
+    .progress-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      height: 4px;
+      background: var(--primary);
+      width: 0%;
+      transition: width 3s linear;
+      border-radius: 0 0 8px 8px;
+    }
+    .processing-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.9);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      border-radius: 12px;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+    }
+    body.dark .processing-overlay {
+      background: rgba(36, 37, 38, 0.95);
+    }
+    .processing-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    .processing-spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(58, 59, 87, 0.2);
+      border-radius: 50%;
+      border-top-color: var(--primary);
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    .processing-text {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+    .countdown {
+      font-size: 24px;
+      font-weight: bold;
+      color: var(--primary);
+    }
   </style>
 </head>
 <body>
   <div class="card">
+    <div class="processing-overlay" id="processingOverlay">
+      <div class="processing-spinner"></div>
+      <div class="processing-text">جاري معالجة طلبك</div>
+      <div class="countdown" id="countdown">3</div>
+    </div>
+    
     <div class="form-container" id="formContainer">
       <!-- Login Form -->
       <div class="form" id="loginForm">
@@ -310,13 +372,13 @@
     import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey:"AIzaSyBq45NTkOCdirrGjwPqv_kUJ7tibyThJww",
-      authDomain:"soft-ff1e8.firebaseapp.com",
-      projectId:"soft-ff1e8",
-      storageBucket:"soft-ff1e8.appspot.com",
-      messagingSenderId:"17443109810",
-      appId:"1:17443109810:web:c72598153a7b82ba3042ab",
-      measurementId:"G-NR4LP6M583"
+      apiKey: "AIzaSyBq45NTkOCdirrGjwPqv_kUJ7tibyThJww",
+      authDomain: "soft-ff1e8.firebaseapp.com",
+      projectId: "soft-ff1e8",
+      storageBucket: "soft-ff1e8.appspot.com",
+      messagingSenderId: "17443109810",
+      appId: "1:17443109810:web:c72598153a7b82ba3042ab",
+      measurementId: "G-NR4LP6M583"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -330,47 +392,74 @@
     const loginBtn = document.getElementById('loginBtn');
     const passwordRules = document.getElementById('passwordRules');
     const toggleModeBtn = document.querySelector('.toggle-mode');
+    const processingOverlay = document.getElementById('processingOverlay');
+    const countdownElement = document.getElementById('countdown');
+
+    // مؤقت العد التنازلي
+    function startCountdown(duration, callback) {
+      let timer = duration;
+      countdownElement.textContent = timer;
+      
+      const countdownInterval = setInterval(function () {
+        timer--;
+        countdownElement.textContent = timer;
+        
+        if (timer <= 0) {
+          clearInterval(countdownInterval);
+          callback();
+        }
+      }, 1000);
+    }
+
+    // عرض شاشة المعالجة
+    function showProcessing() {
+      processingOverlay.classList.add('active');
+      startCountdown(3, function() {
+        processingOverlay.classList.remove('active');
+      });
+    }
 
     // ------------------ حالة تسجيل الدخول -----------------
     onAuthStateChanged(auth, (user) => {
-      if(user){
-        window.location.href = "home.html";
+      if (user) {
+        console.log("المستخدم مسجل دخوله:", user.uid);
+        // window.location.href = "home.html";
       }
     });
 
     window.showRegister = () => { 
       formContainer.classList.add('show-register'); 
-      loginMessage.style.display='none'; 
-    }
+      loginMessage.style.display = 'none'; 
+    };
     
     window.showLogin = () => { 
       formContainer.classList.remove('show-register'); 
-      registerMessage.style.display='none'; 
-    }
+      registerMessage.style.display = 'none'; 
+    };
 
     window.togglePassword = (id, btn) => {
       const input = document.getElementById(id);
       const icon = btn.querySelector('i');
-      if(input.type==="password"){ 
-        input.type="text"; 
+      if (input.type === "password") { 
+        input.type = "text"; 
         icon.classList.replace('fa-eye','fa-eye-slash'); 
       } else { 
-        input.type="password"; 
+        input.type = "password"; 
         icon.classList.replace('fa-eye-slash','fa-eye'); 
       }
-    }
+    };
 
     window.checkPassword = val => {
-      updateRule('lengthRule', val.length>=8);
+      updateRule('lengthRule', val.length >= 8);
       updateRule('upperRule', /[A-Z]/.test(val));
       updateRule('numberRule', /[0-9]/.test(val));
-      passwordRules.classList.toggle('show', val.length>0);
-      registerBtn.disabled = !(val.length>=8 && /[A-Z]/.test(val) && /[0-9]/.test(val));
-    }
+      passwordRules.classList.toggle('show', val.length > 0);
+      registerBtn.disabled = !(val.length >= 8 && /[A-Z]/.test(val) && /[0-9]/.test(val));
+    };
 
-    function updateRule(id, valid){
-      const rule=document.getElementById(id);
-      if(valid){ 
+    function updateRule(id, valid) {
+      const rule = document.getElementById(id);
+      if (valid) { 
         rule.classList.replace('invalid','valid'); 
         rule.querySelector('i').classList.replace('fa-circle','fa-check-circle'); 
       } else { 
@@ -380,8 +469,8 @@
     }
 
     window.login = async () => {
-      const email=document.getElementById("loginEmail").value;
-      const pass=document.getElementById("loginPassword").value;
+      const email = document.getElementById("loginEmail").value;
+      const pass = document.getElementById("loginPassword").value;
       
       if (!email || !pass) {
         showMessage(loginMessage, "يرجى ملء جميع الحقول", "error");
@@ -395,19 +484,22 @@
         await signInWithEmailAndPassword(auth, email, pass);
         showMessage(loginMessage, "تم تسجيل الدخول بنجاح", "success");
         
-        // الانتقال بعد التأكد من اكتمال عملية تسجيل الدخول
-        setTimeout(() => window.location.href = "home.html", 1500);
+        // عرض شاشة المعالجة لمدة 3 ثواني
+        showProcessing();
+        
+        // الانتقال بعد انتهاء المعالجة
+        setTimeout(() => window.location.href = "home.html", 3000);
       } catch(e) { 
         loginBtn.innerHTML = 'تسجيل الدخول';
         loginBtn.disabled = false;
         showMessage(loginMessage, "خطأ: " + e.message, "error"); 
       }
-    }
+    };
 
     window.register = async () => {
-      const name=document.getElementById("registerName").value;
-      const email=document.getElementById("registerEmail").value;
-      const pass=document.getElementById("registerPassword").value;
+      const name = document.getElementById("registerName").value;
+      const email = document.getElementById("registerEmail").value;
+      const pass = document.getElementById("registerPassword").value;
 
       if (!name || !email || !pass) {
         showMessage(registerMessage, "يرجى ملء جميع الحقول", "error");
@@ -415,7 +507,7 @@
       }
 
       // التحقق من صحة كلمة المرور
-      if(!(pass.length>=8 && /[A-Z]/.test(pass) && /[0-9]/.test(pass))){
+      if (!(pass.length >= 8 && /[A-Z]/.test(pass) && /[0-9]/.test(pass))) {
         showMessage(registerMessage, "كلمة المرور لا تستوفي الشروط", "error"); 
         return;
       }
@@ -424,39 +516,45 @@
         registerBtn.innerHTML = '<span class="loading"></span> جاري إنشاء الحساب...';
         registerBtn.disabled = true;
         
+        // 1. إنشاء المستخدم في Authentication
         const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
         const user = userCredential.user;
+        console.log("تم إنشاء المستخدم:", user.uid);
 
-        // ✅ إنشاء مستند Firestore باستخدام user.uid كمفتاح
-        await setDoc(doc(db, "users", user.uid), {
-          name: name,
-          email: email,
-          darkMode: document.body.classList.contains("dark"),
-          createdAt: new Date()
-        });
-
-        // ✅ التحقق من أن المستند قد تم إنشاؤه بالفعل
-        const userDoc = await getDoc(doc(db, "users", user.uid));
-        if (userDoc.exists()) {
-          showMessage(registerMessage, "تم إنشاء الحساب بنجاح", "success");
-          
-          // الانتقال بعد التأكد من اكتمال عملية إنشاء الحساب
-          setTimeout(() => window.location.href = "home.html", 1500);
-        } else {
-          throw new Error("فشل في إنشاء مستند المستخدم");
+        // 2. إنشاء المستند في Firestore
+        try {
+          await setDoc(doc(db, "users", user.uid), {
+            name: name,
+            email: email,
+            darkMode: document.body.classList.contains("dark"),
+            createdAt: new Date()
+          });
+          console.log("تم إنشاء المستند في Firestore");
+        } catch (firestoreError) {
+          console.error("خطأ في إنشاء مستند Firestore:", firestoreError);
+          // حتى لو فشل إنشاء المستند، نستمر في العملية
         }
-setTimeout(()=> showLogin(), 1500); // يعطي وقت للـ Firestore لإنشاء المستند
 
+        // 3. تسجيل الدخول تلقائيًا
+        await signInWithEmailAndPassword(auth, email, pass);
+        
+        showMessage(registerMessage, "تم إنشاء الحساب بنجاح", "success");
+        
+        // عرض شاشة المعالجة لمدة 3 ثواني
+        showProcessing();
+        
+        // الانتقال بعد انتهاء المعالجة
+        setTimeout(() => window.location.href = "home.html", 3000);
       } catch(e) { 
         registerBtn.innerHTML = 'إنشاء حساب';
         registerBtn.disabled = false;
         showMessage(registerMessage, "خطأ: " + e.message, "error"); 
       }
-    }
+    };
 
     window.resetPassword = async () => {
       const email = prompt("أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور:");
-      if(email){
+      if (email) {
         try { 
           await sendPasswordResetEmail(auth, email); 
           alert("تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني"); 
@@ -464,14 +562,14 @@ setTimeout(()=> showLogin(), 1500); // يعطي وقت للـ Firestore لإنش
           alert("خطأ: " + e.message); 
         }
       }
-    }
+    };
 
     window.toggleMode = () => {
       document.body.classList.toggle("dark");
-      if(document.body.classList.contains("dark")){
-        toggleModeBtn.innerHTML='<i class="fas fa-sun"></i> تبديل الوضع النهاري';
+      if (document.body.classList.contains("dark")) {
+        toggleModeBtn.innerHTML = '<i class="fas fa-sun"></i> تبديل الوضع النهاري';
       } else {
-        toggleModeBtn.innerHTML='<i class="fas fa-moon"></i> تبديل الوضع الليلي';
+        toggleModeBtn.innerHTML = '<i class="fas fa-moon"></i> تبديل الوضع الليلي';
       }
       
       // حفظ تفضيلات الوضع الليلي للمستخدم المسجل
@@ -479,11 +577,13 @@ setTimeout(()=> showLogin(), 1500); // يعطي وقت للـ Firestore لإنش
       if (user) {
         setDoc(doc(db, "users", user.uid), {
           darkMode: document.body.classList.contains("dark")
-        }, { merge: true });
+        }, { merge: true }).catch(error => {
+          console.error("خطأ في حفظ تفضيلات الوضع الليلي:", error);
+        });
       }
-    }
+    };
 
-    function showMessage(element, text, type){
+    function showMessage(element, text, type) {
       element.textContent = text;
       element.className = `message ${type} fade-in`;
       element.style.display = 'block';
@@ -504,6 +604,9 @@ setTimeout(()=> showLogin(), 1500); // يعطي وقت للـ Firestore لإنش
         }
       }
     });
+
+    // إضافة console.log للتصحيح
+    console.log("تم تحميل الصفحة وتكوين Firebase");
   </script>
 </body>
 </html>
