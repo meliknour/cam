@@ -1,125 +1,92 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>الصفحة الرئيسية</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <style>
-    body {
-      font-family: "Poppins", sans-serif;
-      margin: 0;
-      background: var(--bg, #f0f2f5);
-      color: var(--text, #333);
+<script type="module">
+  // Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import { 
+    getAuth, onAuthStateChanged, signOut 
+  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  import { 
+    getFirestore, doc, getDoc, updateDoc 
+  } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBq45NTkOCdirrGjwPqv_kUJ7tibyThJww",
+    authDomain: "soft-ff1e8.firebaseapp.com",
+    projectId: "soft-ff1e8",
+    storageBucket: "soft-ff1e8.appspot.com",
+    messagingSenderId: "17443109810",
+    appId: "1:17443109810:web:7dd2c4dbb462f4c502b9f3"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // تحقق من تسجيل الدخول
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "index.html"; 
+      return;
     }
-    body.dark {
-      --bg: #18191a;
-      --text: #f5f6f7;
-    }
-    header {
-      background: #3a3b57;
-      color: #fff;
-      padding: 10px 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .dropdown {
-      position: relative;
-      display: inline-block;
-    }
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      right: 0;
-      background: #fff;
-      min-width: 160px;
-      box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
-      border-radius: 8px;
-      z-index: 1;
-    }
-    .dropdown-content a {
-      color: #333;
-      padding: 10px;
-      text-decoration: none;
-      display: block;
-    }
-    .dropdown-content a:hover {
-      background: #f0f0f0;
-    }
-    .dropdown:hover .dropdown-content {
-      display: block;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>مرحبًا بك</h1>
-    <div class="dropdown">
-      <a href="#"><i class="fas fa-bars"></i></a>
-      <div class="dropdown-content">
-        <a href="settings.html"><i class="fas fa-cog"></i> الإعدادات</a>
-        <a href="#" id="toggle-mode"><i class="fas fa-adjust"></i> تبديل الوضع</a>
-        <a href="#" id="logout"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
-      </div>
-    </div>
-  </header>
 
-  <main>
-    <p>هذه هي الصفحة الرئيسية.</p>
-  </main>
-
-  <script type="module">
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore.js";
-    import { app } from "./file/firebase-config.js"; // ملف الإعدادات الخاص بك
-
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // متابعة حالة المستخدم
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = "index.html";
-        return;
-      }
-
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) {
-        const darkMode = userSnap.data().darkMode;
-        if (darkMode) {
-          document.body.classList.add("dark");
-        }
-      }
-    });
-
-    // تبديل الوضع
-    document.getElementById("toggle-mode").addEventListener("click", async () => {
-      const user = auth.currentUser;
-      if (!user) return;
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
-
-      let newMode = true;
-      if (userSnap.exists()) {
-        newMode = !userSnap.data().darkMode;
-      }
-
-      await updateDoc(userRef, { darkMode: newMode });
-
-      if (newMode) {
+    // جلب الوضع من جدول المستخدم
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+    if (userSnap.exists()) {
+      const darkMode = userSnap.data().darkMode;
+      if (darkMode) {
         document.body.classList.add("dark");
       } else {
         document.body.classList.remove("dark");
       }
-    });
+    }
+  });
 
-    // تسجيل الخروج
-    document.getElementById("logout").addEventListener("click", async () => {
-      await signOut(auth);
+  // تسجيل الخروج
+  function logout() {
+    signOut(auth).then(() => {
       window.location.href = "index.html";
     });
-  </script>
-</body>
-</html>
+  }
+  window.logout = logout;
+
+  // تبديل الوضع
+  async function toggleDarkMode() {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    let newMode = true;
+    if (userSnap.exists()) {
+      newMode = !userSnap.data().darkMode;
+    }
+
+    // تحديث في قاعدة البيانات
+    await updateDoc(userRef, { darkMode: newMode });
+
+    // تحديث المظهر مباشرة
+    if (newMode) {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+  }
+  window.toggleDarkMode = toggleDarkMode;
+
+  // إظهار/إخفاء القائمة المنبثقة
+  const settingsBtn = document.getElementById("settingsBtn");
+  const settingsMenu = document.getElementById("settingsMenu");
+
+  settingsBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    settingsMenu.classList.toggle("show");
+  });
+
+  // إخفاء القائمة عند الضغط خارجها
+  window.addEventListener("click", (e) => {
+    if (!settingsBtn.contains(e.target) && !settingsMenu.contains(e.target)) {
+      settingsMenu.classList.remove("show");
+    }
+  });
+</script>
