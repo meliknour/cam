@@ -1,130 +1,352 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>الحولي السوفي | تراث وهوية</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#123650">
+  <meta name="description" content="موقعي كتطبيق ويب قابل للتثبيت على الهاتف والكمبيوتر.">
+  <title>تطبيقي</title>
 
-<!-- إعدادات تطبيق الويب التقدمي (PWA) -->
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#123650">
-<!-- للأجهزة التي تعمل بنظام آي أو إس (أפל) -->
-<link rel="apple-touch-icon" href="/icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="الحولي السوفي">
+  <!-- إعدادات تطبيق الويب -->
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
 
-<style>
-:root{--navy:#123650;--navy2:#1c4964;--gold:#c8953e;--cream:#fbf7ef;--ink:#203747;--muted:#667784;--line:#e8dfd0;--white:#fff}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--cream);color:var(--ink);font-family:"Tahoma","Arial",sans-serif;line-height:1.85}
-a{color:inherit;text-decoration:none}
-.wrap{width:min(1120px,92%);margin:auto}
-header{position:sticky;top:0;z-index:5;background:#fffdf8ee;backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.nav{display:flex;align-items:center;justify-content:space-between;gap:18px;min-height:72px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:800;color:var(--navy)}
-.brand-mark{width:42px;height:42px;border:2px solid var(--gold);border-radius:50%;display:grid;place-items:center;font-size:22px}
-nav{display:flex;gap:22px;flex-wrap:wrap;font-size:14px;color:#405766}
-nav a:hover{color:var(--gold)}
-.hero{position:relative;overflow:hidden;background:linear-gradient(120deg,#fdf9f0 0%,#f3e8d4 55%,#e9d4ad 100%);border-bottom:1px solid var(--line)}
-.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;align-items:center;gap:32px;min-height:460px;padding:46px 0}
-.eyebrow{display:inline-flex;align-items:center;gap:9px;color:#8a6327;font-weight:700;font-size:14px}
-.eyebrow:before{content:"";width:28px;height:2px;background:var(--gold)}
-h1{font-size:clamp(38px,5vw,66px);line-height:1.2;color:var(--navy);margin:12px 0}
-.lead{font-size:clamp(17px,2vw,21px);max-width:620px;color:#41596a}
-.hero-note{margin-top:24px;padding:12px 18px;border-right:3px solid var(--gold);background:#fffaf1b8;border-radius:8px;max-width:560px}
-.hero-visual{height:365px;position:relative;display:flex;align-items:center;justify-content:center}
-.hero-visual img{height:100%;width:100%;object-fit:cover;object-position:center 22%;border-radius:180px 180px 18px 18px;border:7px solid #fffaf0;box-shadow:0 20px 45px #263b3f24}
-.visual-tag{position:absolute;bottom:20px;right:-8px;background:var(--navy);color:white;border:2px solid var(--gold);padding:10px 16px;border-radius:12px;font-size:13px}
-.section{padding:64px 0}
-.section-head{text-align:center;max-width:720px;margin:0 auto 30px}
-.kicker{color:#9a702e;font-weight:800;font-size:13px;letter-spacing:.4px}
-h2{color:var(--navy);font-size:clamp(27px,3vw,38px);margin:5px 0 8px}
-.section-head p{margin:0;color:var(--muted)}
-.about-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:24px;align-items:stretch}
-.about-card{padding:28px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 8px 25px #1a34440a}
-.about-card h3{color:var(--navy);margin-top:0}
-.fact-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
-.fact{padding:13px;background:#f9f4e9;border-radius:12px;text-align:center}
-.fact strong{display:block;color:var(--navy);font-size:20px}
-.fact span{font-size:12px;color:var(--muted)}
-.quote{background:var(--navy);color:white;border-radius:18px;padding:30px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden}
-.quote:after{content:"✦";position:absolute;font-size:150px;color:#ffffff0b;left:18px;bottom:-48px}
-.quote p{font-size:21px;margin:0 0 14px;position:relative;z-index:1}
-.quote small{color:#e8cf9c}
-.parts{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
-.part{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 18px;transition:transform .2s,box-shadow .2s}
-.part:hover{transform:translateY(-4px);box-shadow:0 12px 26px #12365012}
-.part .num{width:42px;height:42px;border-radius:12px;background:#f6ead2;color:#8a6224;display:grid;place-items:center;font-weight:900;font-size:19px}
-.part h3{margin:13px 0 5px;color:var(--navy);font-size:19px}
-.part p{margin:0;color:var(--muted);font-size:14px}
-.info-band{background:#f0e5d1;border-block:1px solid #e6d6b9}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-.info-panel{background:#fffdf9;border:1px solid var(--line);border-radius:18px;padding:26px}
-.info-panel h3{color:var(--navy);margin-top:0}
-.list{padding:0;margin:0;list-style:none}
-.list li{padding:10px 0;border-bottom:1px solid #eee6d9}
-.list li:last-child{border:0}
-.list li strong{color:var(--navy)}
-.swatches{display:flex;gap:11px;flex-wrap:wrap;margin-top:16px}
-.swatch{width:65px;text-align:center;font-size:12px;color:var(--muted)}
-.dot{height:43px;width:43px;border-radius:50%;margin:0 auto 6px;border:3px solid #fff;box-shadow:0 0 0 1px #ddd}
-.pattern{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:16px}
-.pattern span{display:block;height:58px;border-radius:10px;background:repeating-linear-gradient(135deg,#17191c 0 8px,#b5164b 8px 14px,#e7bd43 14px 20px,#176d58 20px 25px,#17191c 25px 32px);border:3px solid white;outline:1px solid var(--line)}
-.preservation{display:grid;grid-template-columns:.8fr 1.2fr;gap:26px;align-items:center}
-.preservation-icon{background:var(--navy);color:#fff;border-radius:18px;padding:30px;text-align:center}
-.preservation-icon .symbol{font-size:54px;color:#e6bd6f}
-.preservation-icon strong{display:block;font-size:20px}
-footer{background:#102f44;color:#fff;padding:25px 0;text-align:center}
-footer strong{color:#e7bd6b}
-footer p{margin:4px 0;color:#d3dee4;font-size:14px}
-@media(max-width:800px){nav{display:none}.hero-grid,.about-grid,.two-col,.preservation{grid-template-columns:1fr}.hero-grid{padding:30px 0}.hero-visual{height:320px;max-width:420px;width:100%;margin:auto}.parts{grid-template-columns:repeat(2,1fr)}.section{padding:46px 0}}
-@media(max-width:480px){.parts{grid-template-columns:1fr}.fact-row{grid-template-columns:1fr}.hero-visual{height:290px}.brand{font-size:14px}}
-</style>
+  <style>
+    :root {
+      color-scheme: light;
+      --primary: #123650;
+      --primary-hover: #1b4a67;
+      --background: #f4f7fa;
+      --surface: #ffffff;
+      --text: #172b3a;
+      --muted: #647585;
+      --border: #dfe7ee;
+      --accent: #d7a13b;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      min-height: 100%;
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      min-height: 100dvh;
+      font-family: Tahoma, Arial, sans-serif;
+      background: var(--background);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    button, a { font: inherit; }
+
+    .app {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      padding-top: env(safe-area-inset-top);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .topbar-inner {
+      width: min(1100px, 100%);
+      min-height: 64px;
+      margin: auto;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+      color: var(--primary);
+      font-weight: 800;
+    }
+
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      flex: 0 0 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 21px;
+    }
+
+    .brand-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .install-button {
+      display: none;
+      flex: 0 0 auto;
+      padding: 9px 14px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .install-button:hover { background: var(--primary-hover); }
+
+    main {
+      width: min(1100px, 100%);
+      margin: 0 auto;
+      padding: 26px 18px 38px;
+      flex: 1;
+    }
+
+    .welcome {
+      padding: clamp(24px, 6vw, 48px);
+      border-radius: 22px;
+      background: linear-gradient(135deg, var(--primary), #28617b);
+      color: white;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .welcome::after {
+      content: "✦";
+      position: absolute;
+      left: 18px;
+      bottom: -60px;
+      color: rgb(255 255 255 / 8%);
+      font-size: 210px;
+      pointer-events: none;
+    }
+
+    .welcome .eyebrow {
+      display: inline-block;
+      color: #f1d28f;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 6vw, 44px);
+      line-height: 1.25;
+    }
+
+    .welcome p {
+      max-width: 650px;
+      margin: 0;
+      color: #e5eef3;
+      font-size: clamp(15px, 2.5vw, 18px);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .card {
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: 0 5px 18px rgb(18 54 80 / 4%);
+    }
+
+    .card-icon {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 13px;
+      background: #eaf1f6;
+      color: var(--primary);
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+
+    .card h2 {
+      margin: 0 0 7px;
+      color: var(--primary);
+      font-size: 18px;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .install-help {
+      display: none;
+      margin-top: 20px;
+      padding: 18px 20px;
+      border: 1px solid #ead8ad;
+      border-radius: 14px;
+      background: #fff9e9;
+      color: #654d20;
+    }
+
+    .install-help p { margin: 5px 0 0; font-size: 14px; }
+
+    footer {
+      padding: 18px;
+      padding-bottom: calc(18px + env(safe-area-inset-bottom));
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 760px) {
+      .content-grid { grid-template-columns: 1fr; }
+      main { padding: 18px 14px 28px; }
+      .topbar-inner { padding-inline: 14px; }
+      .welcome { border-radius: 18px; }
+      .card { padding: 18px; }
+    }
+
+    @media (display-mode: standalone) {
+      .install-button { display: none !important; }
+    }
+  </style>
 </head>
 <body>
-<header>
-  <div class="wrap nav">
-    <a class="brand" href="#home"><span class="brand-mark">✥</span><span>الحولي السوفي<br><small style="font-weight:400;color:#75818a">تراث وهوية</small></span></a>
-    <nav>
-      <a href="#about">التعريف</a><a href="#parts">مكوّنات اللباس</a><a href="#craft">الخامات والزخرفة</a><a href="#colors">الألوان</a><a href="#heritage">الحفاظ على التراث</a>
-    </nav>
-  </div>
-</header>
-<main>
-<section class="hero" id="home">
-  <div class="wrap hero-grid">
-    <div>
-      <span class="eyebrow">من ذاكرة وادي سوف</span>
-      <h1>الحولي السوفي</h1>
-      <p class="lead">لباس المرأة التقليدي الأصيل في منطقة وادي سوف، يحمل في طيّاته ملامح الهوية المحلية وجمال الحرفة ودقّة التفاصيل المتوارثة عبر الأجيال.</p>
-      <div class="hero-note">قطعة لباس تتجاوز وظيفتها اليومية؛ فهي تعبير عن الانتماء والذوق والذاكرة الثقافية للمنطقة.</div>
-    </div>
-    <div class="hero-visual">
-      <img alt="تفاصيل اللباس التقليدي للحولي السوفي" src="data:image/jpeg;base64,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" />
-      <span class="visual-tag">التراث السوفي</span>
-    </div>
-  </div>
-</section>
-<main>
-  <!-- بقية أقسام الموقع الخاصة بك كما هي -->
-</main>
-<footer>
-  <div class="wrap">
-    <p>&copy; 2026 <strong>الحولي السوفي</strong>. جميع الحقوق محفوظة.</p>
-  </div>
-</footer>
+  <div class="app">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <a class="brand" href="./" aria-label="الصفحة الرئيسية" style="text-decoration:none">
+          <span class="brand-icon" aria-hidden="true">✦</span>
+          <span class="brand-name" id="brandName">تطبيقي</span>
+        </a>
+        <button class="install-button" id="installButton" type="button">تثبيت التطبيق</button>
+      </div>
+    </header>
 
-<!-- كود لتسجيل الـ Service Worker ليعمل التطبيق بسلاسة -->
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js')
-        .then(reg => console.log('Service Worker registered!'))
-        .catch(err => console.log('Service Worker registration failed', err));
+    <main>
+      <!-- عدّل هذا القسم وضع محتوى موقعك الحالي مكانه -->
+      <section class="welcome">
+        <span class="eyebrow">تجربة ويب كتطبيق</span>
+        <h1 id="pageTitle">مرحباً بك</h1>
+        <p id="pageDescription">
+          هذا نموذج جاهز لموقع يدعم التثبيت على الهاتف والكمبيوتر، ويفتح في نافذة مستقلة بعد تثبيته.
+          يمكنك استبدال هذا المحتوى بمحتوى موقعك الحالي.
+        </p>
+      </section>
+
+      <section class="content-grid" aria-label="مميزات الموقع">
+        <article class="card">
+          <div class="card-icon" aria-hidden="true">📱</div>
+          <h2>واجهة متجاوبة</h2>
+          <p>تتكيّف الصفحة مع شاشة الهاتف والكمبيوتر لتسهيل الاستخدام.</p>
+        </article>
+        <article class="card">
+          <div class="card-icon" aria-hidden="true">⚡</div>
+          <h2>تثبيت سريع</h2>
+          <p>يمكن إضافة الموقع إلى الشاشة الرئيسية وفتحه مثل التطبيق في المتصفحات المدعومة.</p>
+        </article>
+        <article class="card">
+          <div class="card-icon" aria-hidden="true">🌐</div>
+          <h2>جاهز للربط</h2>
+          <p>يمكنك إضافة صفحاتك وصورك وأقسام موقعك بدل محتوى المثال الحالي.</p>
+        </article>
+      </section>
+
+      <aside class="install-help" id="installHelp">
+        <strong>طريقة التثبيت</strong>
+        <p id="installHelpText">افتح قائمة المتصفح وابحث عن «إضافة إلى الشاشة الرئيسية» أو «تثبيت التطبيق».</p>
+      </aside>
+    </main>
+
+    <footer>
+      <span id="footerText">تطبيقي © <span id="year"></span></span>
+    </footer>
+  </div>
+
+  <script>
+    // غيّر اسم التطبيق والنصوص هنا عند الحاجة.
+    const APP_NAME = "تطبيقي";
+
+    document.title = APP_NAME;
+    document.getElementById("brandName").textContent = APP_NAME;
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // تسجيل Service Worker لجعل الموقع قابلاً للتثبيت ودعم التخزين المؤقت.
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("./sw.js")
+          .catch(function (error) {
+            console.error("تعذّر تسجيل Service Worker:", error);
+          });
+      });
+    }
+
+    // زر تثبيت يظهر عندما يسمح المتصفح بعرض نافذة التثبيت.
+    let deferredInstallPrompt = null;
+    const installButton = document.getElementById("installButton");
+    const installHelp = document.getElementById("installHelp");
+    const installHelpText = document.getElementById("installHelpText");
+
+    window.addEventListener("beforeinstallprompt", function (event) {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+      installButton.style.display = "inline-block";
+      installHelp.style.display = "none";
     });
-  }
-</script>
+
+    installButton.addEventListener("click", async function () {
+      if (!deferredInstallPrompt) {
+        installHelp.style.display = "block";
+        installHelpText.textContent =
+          "افتح قائمة المتصفح وابحث عن «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية». قد لا يدعم هذا المتصفح التثبيت من خلال الزر.";
+        return;
+      }
+
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      installButton.style.display = "none";
+    });
+
+    window.addEventListener("appinstalled", function () {
+      installButton.style.display = "none";
+      installHelp.style.display = "none";
+    });
+
+    // إذا لم يظهر زر التثبيت، اعرض إرشادات التثبيت اليدوي على الهواتف.
+    window.addEventListener("load", function () {
+      const isStandalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.navigator.standalone === true;
+
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+      if (!isStandalone && isMobile) {
+        installHelp.style.display = "block";
+      }
+    });
+  </script>
 </body>
 </html>
