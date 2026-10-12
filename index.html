@@ -1,318 +1,484 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>تسجيل الدخول / إنشاء حساب</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root { 
-      --bg:#f0f2f5; 
-      --card:#fff; 
-      --primary:#3a3b57; 
-      --text:#111; 
-      --error:#d93025; 
-      --success:#188038; 
-      --transition:all 0.3s ease; 
-    }
-    body.dark { 
-      --bg:#18191a; 
-      --card:#242526; 
-      --primary:#9aa0a6; 
-      --text:#e4e6eb; 
-    }
-    body { 
-      font-family:'Segoe UI',Tahoma,Arial,sans-serif; 
-      background:var(--bg); 
-      margin:0; 
-      display:flex; 
-      justify-content:center; 
-      align-items:center; 
-      min-height:100vh; 
-      transition:var(--transition); 
-      padding:20px; 
-    }
-    .card { 
-      background:var(--card); 
-      padding:25px; 
-      border-radius:12px; 
-      box-shadow:0 4px 15px rgba(0,0,0,0.1); 
-      width:100%; 
-      max-width:420px; 
-      min-height:400px; 
-      transition:var(--transition); 
-      position:relative; 
-      display:flex; 
-      flex-direction:column; 
-    }
-    h2 { 
-      margin:0 0 20px; 
-      color:var(--primary); 
-      text-align:center; 
-    }
-    .form-container { 
-      position:relative; 
-      flex:1; 
-      min-height:380px; 
-    }
-    .form { 
-      position:absolute; 
-      width:100%; 
-      transition:all 0.4s cubic-bezier(0.68,-0.55,0.27,1.55); 
-    }
-    #loginForm { left:0; opacity:1; transform:translateX(0); }
-    #registerForm { left:0; opacity:0; transform:translateX(100%); }
-    .show-register #loginForm { opacity:0; transform:translateX(-100%); }
-    .show-register #registerForm { opacity:1; transform:translateX(0); }
-    .input-group { margin-bottom:18px; position:relative; }
-    input { 
-      width:90%; padding:12px 40px 12px 12px; border:1px solid #ccc; border-radius:8px;
-      background:transparent; color:var(--text); font-size:15px; 
-    }
-    input:focus { outline:none; border-color:var(--primary); }
-    .toggle-password { 
-      position:absolute; left:12px; top:50%; transform:translateY(-50%); cursor:pointer; 
-      font-size:16px; color:#777; background:none; border:none;
-    }
-    button.submit-btn { 
-      width:100%; padding:12px; border:none; border-radius:8px; 
-      background:var(--primary); color:#fff; font-weight:bold; cursor:pointer;
-      margin-top:5px;
-    }
-    .switch { margin-top:15px; text-align:center; font-size:14px; color:#65676b; }
-    .switch span { color:var(--primary); cursor:pointer; font-weight:600; }
-    .toggle-mode { text-align:center; margin-top:20px; font-size:14px; cursor:pointer; color:var(--primary); }
-    .forgot { text-align:left; font-size:13px; margin-top:-10px; margin-bottom:15px; }
-    .forgot span { color:var(--primary); cursor:pointer; }
-    .password-rules { font-size:12px; margin-bottom:15px; display:none; }
-    .rule { display:flex; align-items:center; gap:6px; margin-bottom:4px; }
-    .rule.valid { color:var(--success); }
-    .rule.invalid { color:var(--error); }
-    .message { padding:10px; border-radius:6px; margin-bottom:15px; text-align:center; display:none; font-size:14px; }
-    .error { background-color: rgba(217,48,37,0.1); color:var(--error); }
-    .success { background-color: rgba(24,128,56,0.1); color:var(--success); }
-    .processing-overlay {
-      position: absolute; top:0; left:0; right:0; bottom:0;
-      background: rgba(255,255,255,0.9); display:flex; flex-direction:column;
-      justify-content:center; align-items:center; z-index:100; border-radius:12px;
-      opacity:0; visibility:hidden; transition:all 0.3s ease;
-    }
-    body.dark .processing-overlay { background: rgba(36,37,38,0.95); }
-    .processing-overlay.active { opacity:1; visibility:visible; }
-    .processing-spinner {
-      width:50px; height:50px; border:5px solid rgba(58,59,87,0.2);
-      border-radius:50%; border-top-color:var(--primary); animation:spin 1s linear infinite;
-      margin-bottom:20px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .countdown { font-size:24px; font-weight:bold; color:var(--primary); }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <div class="processing-overlay" id="processingOverlay">
-      <div class="processing-spinner"></div>
-      <div class="countdown" id="countdown">3</div>
-    </div>
-    
-    <div class="form-container" id="formContainer">
-      <!-- Login Form -->
-      <div class="form" id="loginForm">
-        <h2>تسجيل الدخول</h2>
-        <div class="message error" id="loginMessage"></div>
-        <div class="input-group">
-          <input type="email" id="loginEmail" placeholder="البريد الإلكتروني" required>
-        </div>
-        <div class="input-group">
-          <input type="password" id="loginPassword" placeholder="كلمة المرور" required>
-          <button type="button" class="toggle-password" onclick="togglePassword('loginPassword', this)">
-            <i class="far fa-eye"></i>
-          </button>
-        </div>
-        <div class="forgot"><span onclick="resetPassword()">نسيت كلمة المرور؟</span></div>
-        <button class="submit-btn" onclick="login()" id="loginBtn">تسجيل الدخول</button>
-        <div class="switch">ليس لديك حساب؟ <span onclick="showRegister()">إنشاء حساب</span></div>
-      </div>
-
-      <!-- Register Form -->
-      <div class="form" id="registerForm">
-        <h2>إنشاء حساب</h2>
-        <div class="message error" id="registerMessage"></div>
-        <div class="input-group">
-          <input type="text" id="registerName" placeholder="الاسم الكامل" required>
-        </div>
-        <div class="input-group">
-          <input type="email" id="registerEmail" placeholder="البريد الإلكتروني" required>
-        </div>
-        <div class="input-group">
-          <input type="password" id="registerPassword" placeholder="كلمة المرور" required oninput="checkPassword(this.value)">
-          <button type="button" class="toggle-password" onclick="togglePassword('registerPassword', this)">
-            <i class="far fa-eye"></i>
-          </button>
-        </div>
-        <div id="passwordRules" class="password-rules">
-          <div class="rule invalid" id="lengthRule"><i class="fas fa-circle"></i> 8 أحرف على الأقل</div>
-          <div class="rule invalid" id="upperRule"><i class="fas fa-circle"></i> حرف كبير واحد على الأقل</div>
-          <div class="rule invalid" id="numberRule"><i class="fas fa-circle"></i> رقم واحد على الأقل</div>
-        </div>
-        <button class="submit-btn" onclick="register()" id="registerBtn">إنشاء حساب</button>
-        <div class="switch">لديك حساب بالفعل؟ <span onclick="showLogin()">تسجيل الدخول</span></div>
-      </div>
-    </div>
-
-    <div class="toggle-mode" onclick="toggleMode()">
-      <i class="fas fa-moon"></i> تبديل الوضع الليلي
-    </div>
-  </div>
-
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBq45NTkOCdirrGjwPqv_kUJ7tibyThJww",
-      authDomain: "soft-ff1e8.firebaseapp.com",
-      projectId: "soft-ff1e8",
-      storageBucket: "soft-ff1e8.appspot.com",
-      messagingSenderId: "17443109810",
-      appId: "1:17443109810:web:c72598153a7b82ba3042ab",
-      measurementId: "G-NR4LP6M583"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    const loginMessage = document.getElementById('loginMessage');
-    const registerMessage = document.getElementById('registerMessage');
-    const formContainer = document.getElementById('formContainer');
-    const registerBtn = document.getElementById('registerBtn');
-    const loginBtn = document.getElementById('loginBtn');
-    const passwordRules = document.getElementById('passwordRules');
-    const toggleModeBtn = document.querySelector('.toggle-mode');
-    const processingOverlay = document.getElementById('processingOverlay');
-    const countdownElement = document.getElementById('countdown');
-
-    function startCountdown(duration, callback) {
-      let timer = duration;
-      countdownElement.textContent = timer;
-      const countdownInterval = setInterval(() => {
-        timer--;
-        countdownElement.textContent = timer;
-        if (timer <= 0) {
-          clearInterval(countdownInterval);
-          callback();
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>غرفة الصناعة التقليدية والحرف - البطاقة الرقمية</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <!-- QRCode JS Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#1e1b4b',
+                            purple: '#312e81',
+                            accent: '#4f46e5',
+                            gold: '#d97706',
+                            goldLight: '#f59e0b',
+                            bg: '#0f172a'
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif']
+                    }
+                }
+            }
         }
-      }, 1000);
-    }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transition: all 0.3s ease;
+        }
+        .glass-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #fef3c7 0%, #f59e0b 50%, #d97706 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gold-border {
+            border-image: linear-gradient(to bottom right, #f59e0b, #d97706) 1;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4f46e5;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="text-white flex justify-center items-center p-0 sm:p-4 md:p-6 min-h-screen">
 
-    window.showRegister = () => { formContainer.classList.add('show-register'); loginMessage.style.display = 'none'; };
-    window.showLogin = () => { formContainer.classList.remove('show-register'); registerMessage.style.display = 'none'; };
+    <div class="w-full max-w-md bg-slate-900/80 sm:rounded-3xl border border-white/10 shadow-2xl overflow-hidden relative pb-12 my-0 sm:my-4">
+        
+        <div class="relative h-44 bg-gradient-to-r from-indigo-900 via-purple-900 to-amber-900 flex items-center justify-center overflow-hidden">
+            <!-- Background Decorative Elements -->
+            <div class="absolute -top-10 -right-10 w-40 h-40 bg-amber-500/20 rounded-full blur-2xl"></div>
+            <div class="absolute -bottom-10 -left-10 w-40 h-40 bg-indigo-500/20 rounded-full blur-2xl"></div>
+            
+            <div class="absolute top-4 left-4 z-10">
+                <button onclick="sharePage()" class="w-10 h-10 rounded-full glass-btn flex items-center justify-center text-amber-300 hover:text-white transition">
+                    <i class="fa-solid fa-share-nodes text-lg"></i>
+                </button>
+            </div>
 
-    window.togglePassword = (id, btn) => {
-      const input = document.getElementById(id);
-      const icon = btn.querySelector('i');
-      if (input.type === "password") { input.type = "text"; icon.classList.replace('fa-eye','fa-eye-slash'); }
-      else { input.type = "password"; icon.classList.replace('fa-eye-slash','fa-eye'); }
-    };
+            <div class="absolute top-4 right-4 z-10">
+                <button onclick="toggleQRModal()" class="w-10 h-10 rounded-full glass-btn flex items-center justify-center text-amber-300 hover:text-white transition">
+                    <i class="fa-solid fa-qrcode text-lg"></i>
+                </button>
+            </div>
 
-    window.checkPassword = val => {
-      updateRule('lengthRule', val.length >= 8);
-      updateRule('upperRule', /[A-Z]/.test(val));
-      updateRule('numberRule', /[0-9]/.test(val));
-      passwordRules.style.display = val.length > 0 ? "block" : "none";
-      registerBtn.disabled = !(val.length >= 8 && /[A-Z]/.test(val) && /[0-9]/.test(val));
-    };
+            <!-- Banner Pattern Art -->
+            <div class="opacity-10 text-6xl text-amber-200 font-bold select-none tracking-widest">
+                CAM ARTISANAT
+            </div>
+        </div>
 
-    function updateRule(id, valid) {
-      const rule = document.getElementById(id);
-      rule.className = valid ? "rule valid" : "rule invalid";
-      const icon = rule.querySelector("i");
-      icon.className = valid ? "fas fa-check-circle" : "fas fa-circle";
-    }
+        <div class="relative px-6 pb-4">
+            <div class="flex justify-center -mt-20 mb-3">
+                <div class="relative group">
+                    <div class="w-32 h-32 rounded-full p-1 bg-gradient-to-tr from-amber-400 via-indigo-500 to-amber-200 shadow-xl">
+                        <div class="w-full h-full rounded-full bg-slate-900 flex items-center justify-center overflow-hidden p-2">
+                            <!-- Craft Chamber Logo Icon -->
+                            <div class="w-full h-full rounded-full bg-indigo-950/80 flex flex-col items-center justify-center text-amber-400 border border-amber-500/30">
+                                <i class="fa-solid fa-hands-holding-child text-4xl mb-1"></i>
+                                <span class="text-[9px] font-bold tracking-wider text-amber-200 uppercase">CAM</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="absolute bottom-1 right-1 w-7 h-7 bg-emerald-500 border-2 border-slate-900 rounded-full flex items-center justify-center text-white text-xs shadow-lg" title="جهة رسمية">
+                        <i class="fa-solid fa-check"></i>
+                    </span>
+                </div>
+            </div>
 
-    window.login = async () => {
-      const email = document.getElementById("loginEmail").value;
-      const pass = document.getElementById("loginPassword").value;
-      if (!email || !pass) { showMessage(loginMessage, "يرجى ملء جميع الحقول", "error"); return; }
-    try {
-    await signInWithEmailAndPassword(auth, email, pass);
-    window.location.href = "home.html"; // ✅ دخول مباشر جداً بدون أي رسائل أو انتظار
-  } catch(e) { 
-    showMessage(loginMessage, "خطأ: " + e.message, "error"); 
-  }
-};
+            <div class="text-center space-y-1">
+                <h1 class="text-2xl font-black tracking-wide gold-gradient-text">غرفة الصناعة التقليدية والحرف</h1>
+                <p class="text-xs text-amber-200/80 font-medium">Chambre de l'Artisanat et des Métiers</p>
+                <p class="text-sm text-slate-300 pt-1 font-semibold">تطوير، دعم ومرافقة الحرفيين والصناعات التقليدية</p>
+                
+                <div class="flex items-center justify-center gap-2 mt-3">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-500/10 text-amber-300 border border-amber-500/30">
+                        <i class="fa-solid fa-certificate"></i> مؤسسة عمومية ذات طابع مهني
+                    </span>
+                </div>
+            </div>
 
-    window.register = async () => {
-      const name = document.getElementById("registerName").value;
-      const email = document.getElementById("registerEmail").value;
-      const pass = document.getElementById("registerPassword").value;
-      if (!name || !email || !pass) { showMessage(registerMessage, "يرجى ملء جميع الحقول", "error"); return; }
-      if (!(pass.length >= 8 && /[A-Z]/.test(pass) && /[0-9]/.test(pass))) {
-        showMessage(registerMessage, "كلمة المرور لا تستوفي الشروط", "error"); return;
-      }
-      try {
-        registerBtn.innerHTML = '<span class="loading"></span> جاري إنشاء الحساب...';
-        registerBtn.disabled = true;
-        const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-        const user = userCredential.user;
-        await setDoc(doc(db, "users", user.uid), {
-          name, email, darkMode: document.body.classList.contains("dark"), createdAt: serverTimestamp()
-        });
-        showMessage(registerMessage, "تم إنشاء الحساب بنجاح", "success");
-        processingOverlay.classList.add('active');
-        startCountdown(3, () => { processingOverlay.classList.remove('active'); window.location.href = "home.html"; });
-      } catch(e) { 
-        registerBtn.innerHTML = 'إنشاء حساب'; registerBtn.disabled = false;
-        showMessage(registerMessage, "خطأ: " + e.message, "error"); 
-      }
-    };
+            <div class="mt-4 glass-card rounded-2xl p-3 border border-white/10">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-3 w-3">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                        </span>
+                        <span class="text-xs font-bold text-emerald-400">مفتوح الآن</span>
+                    </div>
+                    <button onclick="toggleHours()" class="text-xs text-slate-300 hover:text-white flex items-center gap-1">
+                        <span>أوقات العمل</span>
+                        <i id="hoursChevron" class="fa-solid fa-chevron-down transition-transform duration-300"></i>
+                    </button>
+                </div>
+                <div id="hoursDetails" class="hidden mt-3 pt-2 border-t border-white/10 text-xs text-slate-300 space-y-1">
+                    <div class="flex justify-between">
+                        <span>الأحد - الخميس:</span>
+                        <span class="font-semibold text-white">08:00 - 16:30</span>
+                    </div>
+                    <div class="flex justify-between text-slate-400">
+                        <span>الجمعة - السبت:</span>
+                        <span class="text-rose-400">عطلة أسبوعية</span>
+                    </div>
+                </div>
+            </div>
 
-    window.resetPassword = async () => {
-      const email = prompt("أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور:");
-      if (email) {
-        try { await sendPasswordResetEmail(auth, email); alert("تم إرسال رابط إعادة التعيين إلى بريدك الإلكتروني"); }
-        catch(e) { alert("خطأ: " + e.message); }
-      }
-    };
+            <div class="grid grid-cols-3 gap-3 mt-5">
+                <a href="tel:+21329000000" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-gradient-to-b from-emerald-600 to-emerald-800 hover:from-emerald-500 hover:to-emerald-700 shadow-lg shadow-emerald-900/30 text-white transition-all transform active:scale-95">
+                    <i class="fa-solid fa-phone text-xl mb-1"></i>
+                    <span class="text-xs font-bold">اتصال</span>
+                </a>
+                
+                <a href="https://wa.me/213600000000" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-gradient-to-b from-green-500 to-emerald-700 hover:from-green-400 hover:to-emerald-600 shadow-lg shadow-green-900/30 text-white transition-all transform active:scale-95">
+                    <i class="fa-brands fa-whatsapp text-2xl mb-1"></i>
+                    <span class="text-xs font-bold">واتساب</span>
+                </a>
 
-    window.toggleMode = () => {
-      document.body.classList.toggle("dark");
-      toggleModeBtn.innerHTML = document.body.classList.contains("dark") ? 
-        '<i class="fas fa-sun"></i> تبديل الوضع النهاري' : 
-        '<i class="fas fa-moon"></i> تبديل الوضع الليلي';
-      const user = auth.currentUser;
-      if (user) setDoc(doc(db, "users", user.uid), { darkMode: document.body.classList.contains("dark") }, { merge: true });
-    };
+                <button onclick="downloadVCard()" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-gradient-to-b from-indigo-600 to-purple-800 hover:from-indigo-500 hover:to-purple-700 shadow-lg shadow-indigo-900/30 text-white transition-all transform active:scale-95">
+                    <i class="fa-solid fa-user-plus text-xl mb-1"></i>
+                    <span class="text-xs font-bold">حفظ جهة الاتصال</span>
+                </button>
+            </div>
 
-    function showMessage(element, text, type) {
-      element.textContent = text;
-      element.className = `message ${type}`;
-      element.style.display = 'block';
-      setTimeout(() => { element.style.display = 'none'; }, 5000);
-    }
+            <div class="flex justify-center items-center gap-3 mt-4">
+                <a href="#" target="_blank" class="w-11 h-11 rounded-xl glass-btn flex items-center justify-center text-blue-400 text-lg hover:text-white hover:bg-blue-600/30">
+                    <i class="fa-brands fa-facebook-f"></i>
+                </a>
+                <a href="#" target="_blank" class="w-11 h-11 rounded-xl glass-btn flex items-center justify-center text-pink-400 text-lg hover:text-white hover:bg-pink-600/30">
+                    <i class="fa-brands fa-instagram"></i>
+                </a>
+                <a href="#" target="_blank" class="w-11 h-11 rounded-xl glass-btn flex items-center justify-center text-red-500 text-lg hover:text-white hover:bg-red-600/30">
+                    <i class="fa-brands fa-youtube"></i>
+                </a>
+                <a href="https://maps.google.com" target="_blank" class="w-11 h-11 rounded-xl glass-btn flex items-center justify-center text-amber-400 text-lg hover:text-white hover:bg-amber-600/30" title="موقعنا على الخريطة">
+                    <i class="fa-solid fa-location-dot"></i>
+                </a>
+            </div>
 
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    // ✅ المستخدم مسجل دخول → روح مباشرة للصفحة الرئيسية
-    if (window.location.pathname.includes("index.html")) {
-      window.location.href = "home.html";
-      return;
-    }
+            <div class="mt-8">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-base font-bold flex items-center gap-2 text-amber-300">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-400"></i>
+                        دليل الخدمات والأعمال
+                    </h2>
+                    <span class="text-xs text-slate-400">اختر خدمة للتفاصيل</span>
+                </div>
 
-    try {
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (userDoc.exists() && userDoc.data().darkMode) {
-        document.body.classList.add("dark");
-        toggleModeBtn.innerHTML = '<i class="fas fa-sun"></i> تبديل الوضع النهاري';
-      }
-    } catch (e) { 
-      console.error("Error loading user preferences:", e); 
-    }
-  }
-});
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- Service Card 1 -->
+                    <div onclick="openServiceModal('carte')" class="glass-card rounded-2xl p-3 border border-white/10 hover:border-amber-500/50 cursor-pointer transition group">
+                        <div class="h-24 rounded-xl bg-gradient-to-tr from-indigo-950 to-slate-800 flex flex-col items-center justify-center p-2 text-center mb-2 relative overflow-hidden group-hover:scale-[1.02] transition">
+                            <i class="fa-solid fa-id-card text-3xl text-amber-400 mb-1"></i>
+                            <span class="text-[10px] font-bold text-amber-200">Carte d'Artisan</span>
+                            <div class="absolute inset-0 bg-amber-500/10 opacity-0 group-hover:opacity-100 transition"></div>
+                        </div>
+                        <h3 class="text-xs font-bold text-white group-hover:text-amber-300 transition text-center">طلب بطاقة حرفي</h3>
+                        <p class="text-[10px] text-slate-400 text-center mt-0.5">التسجيل والتجديد القانوني</p>
+                    </div>
 
-  </script>
+                    <!-- Service Card 2 -->
+                    <div onclick="openServiceModal('formation')" class="glass-card rounded-2xl p-3 border border-white/10 hover:border-amber-500/50 cursor-pointer transition group">
+                        <div class="h-24 rounded-xl bg-gradient-to-tr from-purple-950 to-slate-800 flex flex-col items-center justify-center p-2 text-center mb-2 relative overflow-hidden group-hover:scale-[1.02] transition">
+                            <i class="fa-solid fa-graduation-cap text-3xl text-indigo-400 mb-1"></i>
+                            <span class="text-[10px] font-bold text-indigo-200">Formations</span>
+                            <div class="absolute inset-0 bg-indigo-500/10 opacity-0 group-hover:opacity-100 transition"></div>
+                        </div>
+                        <h3 class="text-xs font-bold text-white group-hover:text-amber-300 transition text-center">التكوين والدورات</h3>
+                        <p class="text-[10px] text-slate-400 text-center mt-0.5">تطوير المهارات والحرف</p>
+                    </div>
+
+                    <!-- Service Card 3 -->
+                    <div onclick="openServiceModal('exposition')" class="glass-card rounded-2xl p-3 border border-white/10 hover:border-amber-500/50 cursor-pointer transition group">
+                        <div class="h-24 rounded-xl bg-gradient-to-tr from-emerald-950 to-slate-800 flex flex-col items-center justify-center p-2 text-center mb-2 relative overflow-hidden group-hover:scale-[1.02] transition">
+                            <i class="fa-solid fa-store text-3xl text-emerald-400 mb-1"></i>
+                            <span class="text-[10px] font-bold text-emerald-200">Expositions</span>
+                            <div class="absolute inset-0 bg-emerald-500/10 opacity-0 group-hover:opacity-100 transition"></div>
+                        </div>
+                        <h3 class="text-xs font-bold text-white group-hover:text-amber-300 transition text-center">المعارض والتظاهرات</h3>
+                        <p class="text-[10px] text-slate-400 text-center mt-0.5">تسويق وترويج المنتجات</p>
+                    </div>
+
+                    <!-- Service Card 4 -->
+                    <div onclick="openServiceModal('accompagnement')" class="glass-card rounded-2xl p-3 border border-white/10 hover:border-amber-500/50 cursor-pointer transition group">
+                        <div class="h-24 rounded-xl bg-gradient-to-tr from-amber-950 to-slate-800 flex flex-col items-center justify-center p-2 text-center mb-2 relative overflow-hidden group-hover:scale-[1.02] transition">
+                            <i class="fa-solid fa-handshake-angle text-3xl text-amber-400 mb-1"></i>
+                            <span class="text-[10px] font-bold text-amber-200">Accompagnement</span>
+                            <div class="absolute inset-0 bg-amber-500/10 opacity-0 group-hover:opacity-100 transition"></div>
+                        </div>
+                        <h3 class="text-xs font-bold text-white group-hover:text-amber-300 transition text-center">دعم ومرافقة</h3>
+                        <p class="text-[10px] text-slate-400 text-center mt-0.5">تمويل وتسهيلات إدارية</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <h2 class="text-base font-bold text-amber-300 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-credit-card"></i>
+                    وسائل الدفع والتحويل (CCP / RIP)
+                </h2>
+
+                <div class="glass-card rounded-2xl p-4 border border-amber-500/20 relative overflow-hidden">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-sm">
+                                CCP
+                            </div>
+                            <div>
+                                <h3 class="text-xs font-bold text-white">الحساب البريدي الجاري</h3>
+                                <p class="text-[10px] text-slate-400">غرفة الصناعة التقليدية والحرف</p>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-money-bill-transfer text-amber-400 text-xl"></i>
+                    </div>
+
+                    <div class="bg-slate-950/60 rounded-xl p-3 mt-3 flex items-center justify-between border border-white/5">
+                        <div class="overflow-hidden">
+                            <p class="text-[10px] text-slate-400">رقم الحساب البريدي / RIP</p>
+                            <p id="ccpNumber" class="font-mono text-sm font-bold text-amber-300 tracking-wider">00799999001631063548</p>
+                        </div>
+                        <button onclick="copyCCP()" class="glass-btn px-3 py-2 rounded-lg text-xs font-bold text-amber-300 hover:text-white flex items-center gap-1 active:scale-95 transition">
+                            <i class="fa-regular fa-copy"></i>
+                            <span id="copyBtnText">نسخ</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-10 pt-6 border-t border-white/10 text-center space-y-2">
+                <p class="text-xs text-slate-400">
+                    <i class="fa-solid fa-bolt text-amber-400"></i> بطاقة رقمية تفاعلية مدعومة
+                </p>
+                <div class="inline-block px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] text-slate-300">
+                    جميع الحقوق محفوظة © <span id="year"></span> غرفة الصناعة التقليدية
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="serviceModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-amber-500/30 w-full max-w-sm rounded-3xl p-6 relative text-right shadow-2xl">
+            <button onclick="closeServiceModal()" class="absolute top-4 left-4 w-8 h-8 rounded-full bg-white/10 text-slate-300 hover:text-white flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <div id="modalIcon" class="w-14 h-14 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-2xl mb-4">
+                <i class="fa-solid fa-info"></i>
+            </div>
+            
+            <h3 id="modalTitle" class="text-lg font-bold text-white mb-2">عنوان الخدمة</h3>
+            <p id="modalDescription" class="text-xs text-slate-300 leading-relaxed mb-6">تفاصيل الخدمة تظهر هنا...</p>
+
+            <a id="modalActionBtn" href="https://wa.me/213600000000" target="_blank" class="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 font-bold text-xs text-slate-950 flex items-center justify-center gap-2 transition">
+                <i class="fa-solid fa-paper-plane"></i>
+                طلب الخدمة عبر الواتساب
+            </a>
+        </div>
+    </div>
+
+    <div id="qrModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-white/20 w-full max-w-xs rounded-3xl p-6 relative text-center shadow-2xl">
+            <button onclick="toggleQRModal()" class="absolute top-4 left-4 w-8 h-8 rounded-full bg-white/10 text-slate-300 hover:text-white flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <h3 class="text-base font-bold text-amber-300 mb-1">امسح رمز الـ QR</h3>
+            <p class="text-xs text-slate-400 mb-4">لمشاركة هذه البطاقة أو فتحها في جهاز آخر</p>
+
+            <div class="bg-white p-4 rounded-2xl inline-block shadow-inner mb-4">
+                <div id="qrcode"></div>
+            </div>
+
+            <button onclick="sharePage()" class="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center justify-center gap-2">
+                <i class="fa-solid fa-share"></i>
+                مشاركة البطاقة
+            </button>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-amber-500 text-slate-950 font-bold px-4 py-2 rounded-full text-xs shadow-xl transition-all duration-300 opacity-0 pointer-events-none z-50 flex items-center gap-2">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toastMessage">تم النسخ بنجاح!</span>
+    </div>
+
+    <script>
+        // Set dynamic current year
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // Toggle Business Hours Details
+        function toggleHours() {
+            const details = document.getElementById('hoursDetails');
+            const chevron = document.getElementById('hoursChevron');
+            details.classList.toggle('hidden');
+            chevron.classList.toggle('rotate-180');
+        }
+
+        // Copy CCP Number to Clipboard
+        function copyCCP() {
+            const ccp = document.getElementById('ccpNumber').innerText;
+            
+            // Temporary textarea technique for reliable copying inside iframe
+            const tempInput = document.createElement("textarea");
+            tempInput.value = ccp;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+
+            // Button feedback
+            const copyBtnText = document.getElementById('copyBtnText');
+            copyBtnText.innerText = "تم النسخ!";
+            showToast("تم نسخ رقم الحساب البريدي بنجاح");
+
+            setTimeout(() => {
+                copyBtnText.innerText = "نسخ";
+            }, 2500);
+        }
+
+        // Display Toast Notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = message;
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        // Service Modal Details Data
+        const servicesData = {
+            carte: {
+                title: "طلب وثائق وبطاقة حرفي",
+                icon: "fa-id-card",
+                desc: "استخراج أو تجديد بطاقة الحرفي، التسجيل في السجل الولائي للحرف والصناعات التقليدية، والحصول على الشهادات المهنية الرسمية."
+            },
+            formation: {
+                title: "التكوين وتحسين المستوى",
+                icon: "fa-graduation-cap",
+                desc: "دورات تدريبية متخصصة في تسيير المؤسسات المصغرة، المحاسبة، والتأهيل في مختلف الحرف التقليدية مع شهادات معتمدة."
+            },
+            exposition: {
+                title: "المعارض والتظاهرات الاقتصادية",
+                icon: "fa-store",
+                desc: "إتاحة الفرصة للحرفيين المشاركة في الصالونات الوطنية والدولية والمعارض المحلية لترويج وبيع المنتجات التقليدية."
+            },
+            accompagnement: {
+                title: "الدعم والتمويل والمرافقة",
+                icon: "fa-handshake-angle",
+                desc: "مرافقة الحرفيين للحصول على القروض الآلية (ANGEM/NESDA) والتسهيلات الجبائية والإدارية لتطوير النشاط."
+            }
+        };
+
+        function openServiceModal(key) {
+            const data = servicesData[key];
+            if (!data) return;
+
+            document.getElementById('modalTitle').innerText = data.title;
+            document.getElementById('modalDescription').innerText = data.desc;
+            document.getElementById('modalIcon').innerHTML = `<i class="fa-solid ${data.icon}"></i>`;
+            
+            document.getElementById('serviceModal').classList.remove('hidden');
+        }
+
+        function closeServiceModal() {
+            document.getElementById('serviceModal').classList.add('hidden');
+        }
+
+        // Generate VCard Data & Download
+        function downloadVCard() {
+            const vCardData = `BEGIN:VCARD
+VERSION:3.0
+FN:غرفة الصناعة التقليدية والحرف
+ORG:Chambre de l'Artisanat et des Métiers
+TEL;TYPE=WORK,VOICE:+21329000000
+TEL;TYPE=CELL,VOICE:+213600000000
+EMAIL:contact@cam-artisanat.dz
+URL:${window.location.href}
+END:VCARD`;
+
+            const blob = new Blob([vCardData], { type: 'text/vcard;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'غرفة_الصناعة_التقليدية.vcf');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast("جاري تحميل ملف جهة الاتصال (VCF)");
+        }
+
+        // QR Code Generator
+        let qrcodeGenerated = false;
+        function toggleQRModal() {
+            const modal = document.getElementById('qrModal');
+            modal.classList.toggle('hidden');
+
+            if (!qrcodeGenerated && !modal.classList.contains('hidden')) {
+                new QRCode(document.getElementById("qrcode"), {
+                    text: window.location.href,
+                    width: 160,
+                    height: 160,
+                    colorDark : "#1e1b4b",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.H
+                });
+                qrcodeGenerated = true;
+            }
+        }
+
+        // Share Web API
+        function sharePage() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'غرفة الصناعة التقليدية والحرف',
+                    text: 'البطاقة الرقمية لغرفة الصناعة التقليدية والحرف',
+                    url: window.location.href,
+                }).catch(() => {});
+            } else {
+                copyCCP();
+                showToast("تم نسخ رابط الصفحة للمشاركة");
+            }
+        }
+    </script>
 </body>
 </html>
